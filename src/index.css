@@ -1,0 +1,291 @@
+@charset "UTF-8";
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* CERBERO Design System - Solvento Branding */
+
+@layer base {
+  :root {
+    /* Solvento Corporate Colors - #00747A */
+    --solvento-primary: 183 100% 24%;
+    --solvento-primary-dark: 183 100% 18%;
+    --solvento-primary-mid: 183 100% 24%;
+    --solvento-primary-soft: 180 60% 90%;
+    --solvento-primary-bg: 180 40% 95%;
+
+    /* Semantic Colors - Using Solvento branding */
+    --background: 180 20% 98%;
+    --foreground: 183 30% 10%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 183 30% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 183 30% 10%;
+
+    /* Primary = Solvento Corporate Teal #00747A */
+    --primary: 183 100% 24%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 180 15% 95%;
+    --secondary-foreground: 183 30% 20%;
+
+    --muted: 180 15% 93%;
+    --muted-foreground: 183 15% 45%;
+
+    /* Accent uses Solvento soft teal */
+    --accent: 180 60% 92%;
+    --accent-foreground: 183 100% 20%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 142 76% 45%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+
+    --border: 180 20% 88%;
+    --input: 180 20% 88%;
+    --ring: 183 100% 24%;
+
+    --radius: 1rem;
+
+    /* Clock-in/out specific - semantic green/red */
+    --clock-in: 142 76% 45%;
+    --clock-in-glow: 142 76% 45%;
+    --clock-out: 0 84% 60%;
+    --clock-out-glow: 0 84% 60%;
+
+    /* Status colors */
+    --status-active: 142 76% 45%;
+    --status-pending: 38 92% 50%;
+    --status-inactive: 183 15% 60%;
+
+    /* Sidebar - Solvento themed */
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 183 30% 20%;
+    --sidebar-primary: 183 100% 24%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 180 60% 92%;
+    --sidebar-accent-foreground: 183 100% 20%;
+    --sidebar-border: 180 20% 90%;
+    --sidebar-ring: 183 100% 24%;
+  }
+
+  .dark {
+    --background: 183 25% 8%;
+    --foreground: 180 20% 98%;
+
+    --card: 183 25% 12%;
+    --card-foreground: 180 20% 98%;
+
+    --popover: 183 25% 12%;
+    --popover-foreground: 180 20% 98%;
+
+    /* Primary = Solvento Corporate Teal (lighter for dark mode) */
+    --primary: 183 80% 45%;
+    --primary-foreground: 183 25% 8%;
+
+    --secondary: 183 20% 18%;
+    --secondary-foreground: 180 15% 90%;
+
+    --muted: 183 20% 20%;
+    --muted-foreground: 180 15% 60%;
+
+    --accent: 183 40% 20%;
+    --accent-foreground: 183 80% 70%;
+
+    --destructive: 0 72% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 142 70% 50%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 38 92% 55%;
+    --warning-foreground: 0 0% 100%;
+
+    --border: 183 20% 20%;
+    --input: 183 20% 20%;
+    --ring: 183 80% 45%;
+
+    --sidebar-background: 183 25% 10%;
+    --sidebar-foreground: 180 20% 90%;
+    --sidebar-primary: 183 80% 45%;
+    --sidebar-primary-foreground: 183 25% 8%;
+    --sidebar-accent: 183 40% 18%;
+    --sidebar-accent-foreground: 183 80% 70%;
+    --sidebar-border: 183 20% 18%;
+    --sidebar-ring: 183 80% 45%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    font-family: "Inter", system-ui, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings:
+      "rlig" 1,
+      "calt" 1;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: "Space Grotesk", "Inter", system-ui, sans-serif;
+  }
+}
+
+@layer components {
+  /* Clock Button Animations */
+  .clock-button {
+    @apply relative overflow-hidden transition-all duration-300 ease-out;
+    box-shadow: 0 4px 20px -4px hsl(var(--primary) / 0.4);
+  }
+
+  .clock-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px -4px hsl(var(--primary) / 0.5);
+  }
+
+  .clock-button:active {
+    transform: translateY(0);
+  }
+
+  .clock-button-enter {
+    background: linear-gradient(135deg, hsl(var(--clock-in)) 0%, hsl(142 70% 40%) 100%);
+    box-shadow: 0 4px 30px -4px hsl(var(--clock-in-glow) / 0.5);
+  }
+
+  .clock-button-enter:hover {
+    box-shadow: 0 8px 40px -4px hsl(var(--clock-in-glow) / 0.6);
+  }
+
+  .clock-button-exit {
+    background: linear-gradient(135deg, hsl(var(--clock-out)) 0%, hsl(0 70% 50%) 100%);
+    box-shadow: 0 4px 30px -4px hsl(var(--clock-out-glow) / 0.5);
+  }
+
+  .clock-button-exit:hover {
+    box-shadow: 0 8px 40px -4px hsl(var(--clock-out-glow) / 0.6);
+  }
+
+  /* Pulse animation for active clock */
+  .pulse-active {
+    animation: pulse-ring 2s ease-out infinite;
+  }
+
+  @keyframes pulse-ring {
+    0% {
+      box-shadow: 0 0 0 0 hsl(var(--clock-in) / 0.5);
+    }
+    70% {
+      box-shadow: 0 0 0 20px hsl(var(--clock-in) / 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 hsl(var(--clock-in) / 0);
+    }
+  }
+
+  /* Card hover effects */
+  .card-interactive {
+    @apply transition-all duration-200 ease-out;
+  }
+
+  .card-interactive:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px -8px hsl(var(--foreground) / 0.1);
+  }
+
+  /* Status indicators */
+  .status-dot {
+    @apply w-2.5 h-2.5 rounded-full;
+  }
+
+  .status-dot-active {
+    @apply bg-success;
+    box-shadow: 0 0 8px hsl(var(--success) / 0.6);
+  }
+
+  .status-dot-pending {
+    @apply bg-warning;
+    animation: blink 1.5s ease-in-out infinite;
+  }
+
+  @keyframes blink {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+
+  /* Glass effect cards */
+  .glass-card {
+    @apply bg-card/80 backdrop-blur-lg border border-border/50;
+  }
+
+  /* Gradient text - Solvento branding */
+  .gradient-text {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--solvento-primary-dark)) 100%);
+  }
+
+  /* Mobile nav */
+  .mobile-nav {
+    @apply fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-lg border-t border-border;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Time display */
+  .time-display {
+    font-family: "Space Grotesk", monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Progress bar */
+  .progress-hours {
+    @apply h-3 rounded-full overflow-hidden bg-muted;
+  }
+
+  .progress-hours-fill {
+    @apply h-full rounded-full transition-all duration-500 ease-out;
+    background: linear-gradient(90deg, hsl(var(--solvento-primary-dark)) 0%, hsl(var(--primary)) 100%);
+  }
+}
+
+@layer utilities {
+  .safe-top {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
