@@ -13,7 +13,11 @@ interface AuthContextType {
   loading: boolean;
 
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
-  signUp: (email: string, password: string, fullName: string) => Promise<{ error: Error | null }>;
+  signUp: (
+    email: string,
+    password: string,
+    fullName: string
+  ) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
   refreshRole: () => Promise<void>;
 }
@@ -28,6 +32,14 @@ function roleFromMetadata(u: User | null): AppRole | null {
   return null;
 }
 
+function normalizeRole(input: any): AppRole {
+  // Tu tabla memberships probablemente tendrá "owner" (y quizá más roles luego).
+  // Para no romper la app: owner/hr/worker.
+  if (input === "owner" || input === "hr" || input === "worker") return input;
+  // si llega algo raro, cae a worker
+  return "worker";
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -38,21 +50,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const loadCompanyContext = async (u: User) => {
     // Siempre resuelve (nunca deja loading colgado)
     try {
-      // Fuente de verdad: company_user_roles
-      const { data, error } = await supabase
-        .from("company_user_roles")
+      // ✅ Fuente de verdad en TU Supabase: memberships
+      // OJO: hacemos cast "as any" para que no dependa de types.ts del repo (está desactualizado)
+      const { data, error } = await (supabase as any)
+        .from("memberships")
         .select("company_id, role")
         .eq("user_id", u.id)
         .maybeSingle();
 
       if (!error && data) {
-        setCompanyId(data.company_id);
-        setRole((data.role as AppRole) ?? roleFromMetadata(u));
+        setCompanyId(data.company_id ?? null);
+        setRole(normalizeRole(data.role) ?? roleFromMetadata(u));
         return;
       }
 
-      // Sin fila (o select bloqueado): fallback a metadata para rol visual,
-      // pero companyId queda null (multi-tenant estricto)
+      // Fallback: rol visual desde metadata si no hay membership
       const mdRole = roleFromMetadata(u);
       setCompanyId(null);
       setRole(mdRole ?? "worker");
