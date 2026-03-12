@@ -1,21 +1,411 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import {
   useOpenEntry,
   useCheckIn,
   useCheckOut,
+  useCreateAdjustment,
 } from "../domain/timeEntries/timeEntries.hooks";
-import { useActiveCompany } from "../domain/companies/companies.hooks";
+import { useActiveMembership } from "../app/useActiveMembership";
+import { useRegisterPushDevice } from "../app/useRegisterPushDevice";
+import { useNavigate } from "react-router-dom";
+
+// ======================================================
+// PARTE 1/6 — TIPOS Y HELPERS
+// ======================================================
+
+type HistoryEntry = {
+  id: string;
+  check_in_at: string;
+  check_out_at: string | null;
+  workflow_status: "auto" | "pending" | "adjusted" | "requires_new_proposal";
+};
+
+type GeoPayload = {
+  lat: number;
+  lng: number;
+  accuracy: number | null;
+  capturedAt: string;
+};
+
+function pad2(n: number) {
+  return String(n).padStart(2, "0");
+}
+
+function formatHHMM(iso: string) {
+  const d = new Date(iso);
+  return `${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+}
+
+function minutesBetween(startIso: string, endIso: string | null) {
+  const start = new Date(startIso).getTime();
+  const end = endIso ? new Date(endIso).getTime() : Date.now();
+  const diffMs = Math.max(0, end - start);
+  return Math.floor(diffMs / 60000);
+}
+
+function hhmmFromMinutes(totalMinutes: number) {
+  const m = Math.max(0, Math.floor(totalMinutes));
+  const h = Math.floor(m / 60);
+  const mm = m % 60;
+  return `${pad2(h)}:${pad2(mm)}`;
+}
+
+function isSameLocalDay(iso: string, day: Date) {
+  const d = new Date(iso);
+  return (
+    d.getFullYear() === day.getFullYear() &&
+    d.getMonth() === day.getMonth() &&
+    d.getDate() === day.getDate()
+  );
+}
+
+function formatLongDateEs(d: Date) {
+  const weekday = d.toLocaleDateString("es-ES", { weekday: "long" });
+  const day = d.getDate();
+  const month = d.toLocaleDateString("es-ES", { month: "long" });
+  return `${weekday}, ${day} de ${month}`;
+}
+
+function getCurrentPosition(): Promise<GeoPayload | null> {
+  return new Promise((resolve) => {
+    if (!navigator.geolocation) {
+      resolve(null);
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        resolve({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+          accuracy: Number.isFinite(position.coords.accuracy)
+            ? position.coords.accuracy
+            : null,
+          capturedAt: new Date(position.timestamp).toISOString(),
+        });
+      },
+      () => resolve(null),
+      {
+        enableHighAccuracy: true,
+        timeout: 5000,
+        maximumAge: 0,
+      }
+    );
+  });
+}
+
+function BracketArrowIcon({ direction }: { direction: "in" | "out" }) {
+  const flip = direction === "out";
+
+  return (
+    <svg width="74" height="74" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+      <g transform={flip ? "translate(48,0) scale(-1,1)" : undefined}>
+        <path
+          d="M28 10H34V38H28"
+          stroke="white"
+          strokeWidth="3.6"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path d="M12 24H27" stroke="white" strokeWidth="3.6" strokeLinecap="round" />
+        <path
+          d="M22 18.5L27.5 24L22 29.5"
+          stroke="white"
+          strokeWidth="3.6"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </g>
+    </svg>
+  );
+}
+
+function IconButton({
+  onClick,
+  disabled,
+  title,
+  children,
+}: {
+  onClick: () => void;
+  disabled?: boolean;
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      disabled={!!disabled}
+      title={title}
+      aria-label={title}
+      style={{
+        width: 64,
+        height: 64,
+        borderRadius: 18,
+        border: "1px solid rgba(15,23,42,0.10)",
+        background: "rgba(248,250,252,1)",
+        display: "grid",
+        placeItems: "center",
+        cursor: disabled ? "not-allowed" : "pointer",
+        opacity: disabled ? 0.45 : 1,
+        boxShadow: "0 6px 14px rgba(2, 6, 23, 0.06)",
+      }}
+    >
+      {children}
+    </button>
+  );
+}
+
+function SettingsIcon() {
+  return (
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4Z"
+        stroke="#0f172a"
+        strokeWidth="2"
+      />
+      <path
+        d="M19.4 12a7.6 7.6 0 0 0-.1-1l2-1.5-2-3.4-2.4 1a7.8 7.8 0 0 0-1.7-1l-.4-2.6H9.2l-.4 2.6a7.8 7.8 0 0 0-1.7 1l-2.4-1-2 3.4 2 1.5a7.6 7.6 0 0 0 0 2l-2 1.5 2 3.4 2.4-1c.5.4 1.1.8 1.7 1l.4 2.6h5.6l.4-2.6c.6-.2 1.2-.6 1.7-1l2.4 1 2-3.4-2-1.5c.1-.3.1-.6.1-1Z"
+        stroke="#0f172a"
+        strokeWidth="2"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function HistoryIcon() {
+  return (
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M12 8v5l3 2"
+        stroke="#0f172a"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M3 12a9 9 0 1 0 3-6.7"
+        stroke="#0f172a"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+      <path
+        d="M3 5v4h4"
+        stroke="#0f172a"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function LogoutIcon() {
+  return (
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M10 7V6a2 2 0 0 1 2-2h7v16h-7a2 2 0 0 1-2-2v-1"
+        stroke="#0f172a"
+        strokeWidth="2"
+        strokeLinejoin="round"
+      />
+      <path d="M4 12h10" stroke="#0f172a" strokeWidth="2" strokeLinecap="round" />
+      <path
+        d="M8 8l-4 4 4 4"
+        stroke="#0f172a"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+// ======================================================
+// PARTE 2/6 — COMPONENTE Y ESTADO
+// ======================================================
 
 export function WorkerPage() {
-  const [userId, setUserId] = useState<string | null>(null);
+  const navigate = useNavigate();
 
-  const {
-    activeCompany,
-    loading: companyLoading,
-    status,
-    message,
-  } = useActiveCompany();
+  const [userId, setUserId] = useState<string | null>(null);
+  const { membership, loading: membershipLoading } = useActiveMembership();
+
+  useRegisterPushDevice(!!membership?.company_id);
+
+  const [history, setHistory] = useState<HistoryEntry[]>([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [historyError, setHistoryError] = useState<string | null>(null);
+
+  const [showAdjust, setShowAdjust] = useState(false);
+  const [adjustReason, setAdjustReason] = useState("");
+  const [tick, setTick] = useState(0);
+
+  const goalHours = 8;
+  const goalMinutes = goalHours * 60;
+
+  const brand = "#4bada9";
+  const enterColor = "#16a34a";
+  const exitColor = "#ef4444";
+
+  const activeCompany = membership?.company_id ?? null;
+  const { data: openEntry, isLoading } = useOpenEntry(activeCompany, userId);
+  const checkIn = useCheckIn(activeCompany, userId);
+  const checkOut = useCheckOut();
+  const createAdjustment = useCreateAdjustment();
+
+  const today = useMemo(() => new Date(), []);
+  const isOpen = !!openEntry;
+
+  // ======================================================
+  // PARTE 3/6 — DATOS DERIVADOS
+  // ======================================================
+
+  const todayEntries = useMemo(() => {
+    return history
+      .filter((h) => isSameLocalDay(h.check_in_at, today))
+      .sort(
+        (a, b) =>
+          new Date(a.check_in_at).getTime() - new Date(b.check_in_at).getTime()
+      );
+  }, [history, today]);
+
+  const lastTodayEntry = useMemo(() => {
+    if (todayEntries.length === 0) return null;
+    return todayEntries[todayEntries.length - 1];
+  }, [todayEntries]);
+
+  const adjustmentTarget = openEntry ?? lastTodayEntry ?? null;
+
+  const isPending = adjustmentTarget?.workflow_status === "pending";
+  const requiresNewProposal =
+    adjustmentTarget?.workflow_status === "requires_new_proposal";
+
+  const isMainBlocked = false;
+  const isAdjustBlocked = !adjustmentTarget || isPending;
+
+  const topMessage = useMemo(() => {
+  if (!membership) {
+    return "No se ha detectado tu empresa. Cierra sesión y vuelve a entrar.";
+  }
+
+  if (requiresNewProposal) {
+    return "Tu ajuste fue rechazado. Envía una nueva propuesta.";
+  }
+
+  return "";
+  }, [membership, requiresNewProposal]);
+
+  const adjustmentHelpText = useMemo(() => {
+    if (openEntry) {
+      return "Estás ajustando la jornada abierta actual. Usa este campo solo si necesitas justificar una corrección.";
+    }
+    if (lastTodayEntry) {
+      return "Estás ajustando el último tramo de hoy. Explica claramente qué ha pasado.";
+    }
+    return "No hay ningún tramo disponible para ajustar.";
+  }, [openEntry, lastTodayEntry]);
+
+  const totalTodayMinutes = useMemo(() => {
+    void tick;
+    let total = 0;
+    for (const e of todayEntries) {
+      total += minutesBetween(e.check_in_at, e.check_out_at);
+    }
+    return total;
+  }, [todayEntries, tick]);
+
+  const mainTime = useMemo(() => {
+    void tick;
+    if (isOpen && openEntry) {
+      return hhmmFromMinutes(minutesBetween(openEntry.check_in_at, null));
+    }
+    return hhmmFromMinutes(totalTodayMinutes);
+  }, [isOpen, openEntry, totalTodayMinutes, tick]);
+
+  const progress = useMemo(() => {
+    if (goalMinutes <= 0) return 0;
+    return Math.min(1, totalTodayMinutes / goalMinutes);
+  }, [totalTodayMinutes, goalMinutes]);
+
+  const isBusy =
+    (isOpen && checkOut.isPending) || (!isOpen && checkIn.isPending);
+
+  const mainLabel = isOpen ? "SALIR" : "ENTRAR";
+  const mainBg = isOpen ? exitColor : enterColor;
+  const todayShown = todayEntries.slice(0, 2);
+
+// ======================================================
+// PARTE 4/6 — CARGA Y ACCIONES
+// ======================================================
+
+async function loadHistory() {
+  if (!activeCompany || !userId) return;
+
+  setHistoryLoading(true);
+  setHistoryError(null);
+
+  const { data, error } = await supabase
+    .from("time_entries")
+    .select("id,check_in_at,check_out_at,workflow_status")
+    .eq("company_id", activeCompany)
+    .eq("user_id", userId)
+    .order("check_in_at", { ascending: false })
+    .limit(50);
+
+  if (error) {
+    setHistoryError(error.message);
+    setHistory([]);
+    setHistoryLoading(false);
+    return;
+  }
+
+  setHistory((data ?? []) as HistoryEntry[]);
+  setHistoryLoading(false);
+}
+
+async function onMainPress() {
+  if (isMainBlocked) return;
+
+  const geo = await getCurrentPosition();
+
+  if (!isOpen) {
+    checkIn.mutate(geo, { onSuccess: () => loadHistory() });
+    return;
+  }
+
+  if (openEntry) {
+    checkOut.mutate(
+      { entryId: openEntry.id, geo },
+      { onSuccess: () => loadHistory() }
+    );
+  }
+}
+
+async function onSubmitAdjustment() {
+  if (!adjustmentTarget) return;
+
+  const reason = adjustReason.trim();
+  if (reason.length < 3) return;
+
+  try {
+    await createAdjustment.mutateAsync({
+      timeEntryId: adjustmentTarget.id,
+      proposedCheckOut: new Date().toISOString(),
+      reason,
+    });
+
+    setAdjustReason("");
+    await loadHistory();
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+  // ======================================================
+  // PARTE 5/6 — EFECTOS Y ESTADOS BASE
+  // ======================================================
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -23,68 +413,470 @@ export function WorkerPage() {
     });
   }, []);
 
-  // ✅ Hooks SIEMPRE se ejecutan (aunque haya null). React Query ya evita llamadas con enabled.
-  const { data: openEntry, isLoading } = useOpenEntry(activeCompany, userId);
-  const checkIn = useCheckIn(activeCompany, userId);
-  const checkOut = useCheckOut();
+  useEffect(() => {
+    if (!activeCompany || !userId) return;
+    loadHistory();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeCompany, userId]);
 
-  // ✅ UI gating (después de hooks)
-  if (!userId) return <div>Cargando usuario...</div>;
-  if (companyLoading) return <div>Cargando empresa...</div>;
+  useEffect(() => {
+    if (!openEntry) return;
+    const t = window.setInterval(() => setTick((x) => x + 1), 1000);
+    return () => window.clearInterval(t);
+  }, [openEntry]);
 
-  if (status === "pending") {
-    return (
-      <div>
-        <h2>Acceso pendiente</h2>
-        <p>{message}</p>
-        <button onClick={() => supabase.auth.signOut()}>Cerrar sesión</button>
-      </div>
-    );
-  }
+  useEffect(() => {
+    if (requiresNewProposal) {
+      setShowAdjust(true);
+    }
+  }, [requiresNewProposal]);
 
-  if (status === "error") {
-    return (
-      <div>
-        <h2>Error</h2>
-        <p>{message}</p>
-        <button onClick={() => supabase.auth.signOut()}>Cerrar sesión</button>
-      </div>
-    );
-  }
+  if (!userId) return <div className="container">Cargando usuario...</div>;
+  if (membershipLoading) return <div className="container">Cargando empresa...</div>;
+  if (!membership) return <div className="container">No hay empresa activa.</div>;
+  if (isLoading) return <div className="container">Cargando estado...</div>;
 
-  if (status === "no-auth") {
-    return (
-      <div>
-        <h2>Sesión no válida</h2>
-        <p>{message}</p>
-        <button onClick={() => supabase.auth.signOut()}>Cerrar sesión</button>
-      </div>
-    );
-  }
-
-  if (!activeCompany) return <div>No hay empresa activa.</div>;
-  if (isLoading) return <div>Cargando estado...</div>;
-
-  const isOpen = !!openEntry;
+  // ======================================================
+  // PARTE 6/6 — UI DE LA PÁGINA
+  // ======================================================
 
   return (
-    <div>
-      <h2>Fichaje</h2>
+    <div
+      className="workerPageUi"
+      style={{
+        minHeight: "100vh",
+        width: "100%",
+        background: `linear-gradient(180deg, ${brand} 0%, #3a9f9b 60%, #2f8e8a 100%)`,
+        display: "flex",
+        justifyContent: "center",
+        padding: 14,
+      }}
+    >
+      <style>{`
+        .workerPageUi * {
+          box-sizing: border-box;
+        }
 
-      <p>
-        Estado actual: <strong>{isOpen ? "EN TURNO" : "FUERA DE TURNO"}</strong>
-      </p>
+        .workerShell {
+          width: 100%;
+          max-width: 520px;
+          display: grid;
+          gap: 12px;
+        }
 
-      {!isOpen && <button onClick={() => checkIn.mutate()}>Entrar</button>}
+        .workerCard {
+          background: rgba(255,255,255,0.96);
+          border-radius: 22px;
+          border: 1px solid rgba(15,23,42,0.08);
+          box-shadow: 0 16px 40px rgba(2, 6, 23, 0.12);
+          backdrop-filter: blur(6px);
+          padding: 16px;
+        }
 
-      {isOpen && openEntry && (
-        <button onClick={() => checkOut.mutate(openEntry.id)}>Salir</button>
-      )}
+        .workerDate {
+          text-align: center;
+          font-size: 16px;
+          font-weight: 900;
+          color: #0f172a;
+          text-transform: capitalize;
+        }
 
-      <br />
-      <br />
+        .workerMainTimeWrap {
+          text-align: center;
+          margin-top: 10px;
+        }
 
-      <button onClick={() => supabase.auth.signOut()}>Cerrar sesión</button>
+        .workerMainTime {
+          font-size: 54px;
+          line-height: 1;
+          font-weight: 950;
+          letter-spacing: 1px;
+          color: #0b1220;
+        }
+
+        .workerMainSub {
+          margin-top: 6px;
+          font-size: 12px;
+          color: #64748b;
+          font-weight: 700;
+        }
+
+        .workerProgressWrap {
+          margin-top: 12px;
+        }
+
+        .workerProgressLabels {
+          display: flex;
+          justify-content: space-between;
+          font-size: 12px;
+          color: #64748b;
+          font-weight: 800;
+          margin-bottom: 6px;
+        }
+
+        .workerProgressBar {
+          height: 12px;
+          border-radius: 999px;
+          background: rgba(15,23,42,0.08);
+          overflow: hidden;
+        }
+
+        .workerProgressValue {
+          height: 100%;
+          width: ${Math.round(progress * 100)}%;
+          background: linear-gradient(90deg, ${brand} 0%, #6ad0c9 100%);
+        }
+
+        .workerMainButtonWrap {
+          margin-top: 16px;
+          display: flex;
+          justify-content: center;
+        }
+
+        .workerMainButton {
+          width: 220px;
+          height: 220px;
+          border-radius: 999px;
+          border: 3px solid rgba(255,255,255,0.28);
+          background: radial-gradient(circle at 30% 25%, rgba(255,255,255,0.34), rgba(255,255,255,0) 45%), ${mainBg};
+          color: white;
+          cursor: ${isBusy || isMainBlocked ? "not-allowed" : "pointer"};
+          box-shadow: 0 16px 42px rgba(2, 6, 23, 0.22);
+          display: grid;
+          place-items: center;
+          opacity: ${isMainBlocked ? 0.65 : 1};
+          transform: ${isBusy ? "scale(0.995)" : "scale(1)"};
+          transition: transform 120ms ease, box-shadow 120ms ease, opacity 120ms ease;
+        }
+
+        .workerMainButtonInner {
+          display: grid;
+          place-items: center;
+          gap: 10px;
+        }
+
+        .workerMainButtonLabel {
+          font-size: 24px;
+          font-weight: 950;
+          letter-spacing: 1px;
+          text-shadow: 0 8px 18px rgba(0,0,0,0.22);
+        }
+
+        .workerMessage {
+          margin-top: 14px;
+          padding: 12px;
+          border-radius: 16px;
+          font-weight: 800;
+          text-align: center;
+          border: 1px solid rgba(15,23,42,0.08);
+          background: rgba(15,23,42,0.04);
+          color: #0f172a;
+        }
+
+        .workerMessage.error {
+          background: #ffeef0;
+          border-color: #ffd4da;
+          color: crimson;
+        }
+
+        .workerTodayHead {
+          display: flex;
+          align-items: baseline;
+          justify-content: space-between;
+          gap: 12px;
+        }
+
+        .workerTodayTitle {
+          font-weight: 950;
+          font-size: 16px;
+          color: #0f172a;
+        }
+
+        .workerTodayTotal {
+          font-weight: 900;
+          color: #0f172a;
+        }
+
+        .workerMuted {
+          margin-top: 10px;
+          color: #64748b;
+        }
+
+        .workerEntries {
+          margin-top: 12px;
+          display: grid;
+          gap: 10px;
+        }
+
+        .workerEntryCard {
+          border-radius: 18px;
+          padding: 12px;
+          border: 1px solid rgba(15,23,42,0.08);
+          background: rgba(248,250,252,1);
+          box-shadow: 0 8px 18px rgba(2, 6, 23, 0.06);
+          display: grid;
+          gap: 10px;
+        }
+
+        .workerEntryTitle {
+          font-weight: 950;
+          color: #0f172a;
+        }
+
+        .workerEntryGrid {
+          display: grid;
+          grid-template-columns: 1fr 1fr 1fr;
+          gap: 8px;
+        }
+
+        .workerEntryMini {
+          background: rgba(255,255,255,0.85);
+          border-radius: 16px;
+          padding: 10px;
+          text-align: center;
+          border: 1px solid rgba(15,23,42,0.06);
+        }
+
+        .workerEntryMiniLabel {
+          font-size: 11px;
+          color: #64748b;
+          font-weight: 800;
+        }
+
+        .workerEntryMiniValue {
+          font-size: 18px;
+          font-weight: 950;
+          color: #0f172a;
+        }
+
+        .workerBottomCard {
+          display: flex;
+          justify-content: space-around;
+          align-items: center;
+        }
+
+        .workerAdjustCard {
+          display: grid;
+          gap: 10px;
+        }
+
+        .workerAdjustTitle {
+          font-weight: 950;
+          color: #0f172a;
+        }
+
+        .workerAdjustHelp {
+          font-size: 12px;
+          color: #64748b;
+          line-height: 1.45;
+          font-weight: 700;
+        }
+
+        .workerAdjustInput {
+          width: 100%;
+          padding: 14px;
+          border-radius: 16px;
+          border: 1px solid rgba(15,23,42,0.12);
+          font-size: 15px;
+          outline: none;
+          background: rgba(248,250,252,1);
+          color: #0f172a;
+        }
+
+        .workerAdjustBtn {
+          width: 100%;
+          padding: 14px;
+          border-radius: 16px;
+          border: none;
+          background: #0f172a;
+          color: white;
+          font-size: 15px;
+          font-weight: 950;
+          cursor: pointer;
+          box-shadow: 0 12px 26px rgba(2, 6, 23, 0.18);
+        }
+
+        .workerAdjustBtn:disabled {
+          opacity: 0.7;
+          cursor: not-allowed;
+        }
+
+        .workerErrorText {
+          color: crimson;
+          font-size: 13px;
+        }
+
+        .workerSuccessText {
+          color: #16a34a;
+          font-size: 13px;
+          font-weight: 900;
+        }
+      `}</style>
+
+      <div className="workerShell">
+        <section className="workerCard">
+          <div className="workerDate">{formatLongDateEs(today)}</div>
+
+          <div className="workerMainTimeWrap">
+            <div className="workerMainTime">{mainTime}</div>
+            <div className="workerMainSub">
+              {isOpen ? "Jornada en curso" : "Trabajado hoy"}
+            </div>
+
+            <div className="workerProgressWrap">
+              <div className="workerProgressLabels">
+                <span>0h</span>
+                <span>{goalHours}h</span>
+              </div>
+
+              <div className="workerProgressBar">
+                <div className="workerProgressValue" />
+              </div>
+            </div>
+          </div>
+
+          <div className="workerMainButtonWrap">
+            <button
+              className="workerMainButton"
+              onClick={onMainPress}
+              disabled={isBusy || isMainBlocked}
+            >
+              <div className="workerMainButtonInner">
+                <BracketArrowIcon direction={isOpen ? "out" : "in"} />
+                <div className="workerMainButtonLabel">{isBusy ? "…" : mainLabel}</div>
+              </div>
+            </button>
+          </div>
+
+          {(topMessage || historyError) && (
+            <div className={`workerMessage ${historyError ? "error" : ""}`}>
+              {historyError ? historyError : topMessage}
+            </div>
+          )}
+        </section>
+
+        <section className="workerCard">
+          <div className="workerTodayHead">
+            <div className="workerTodayTitle">Hoy</div>
+            <div className="workerTodayTotal">
+              Total: {hhmmFromMinutes(totalTodayMinutes)}
+            </div>
+          </div>
+
+          {historyLoading && <div className="workerMuted">Cargando…</div>}
+
+          {!historyLoading && todayEntries.length === 0 && (
+            <div className="workerMuted">Sin registros hoy.</div>
+          )}
+
+          {!historyLoading && todayEntries.length > 0 && (
+            <div className="workerEntries">
+              {todayShown.map((e, idx) => {
+                const mins = minutesBetween(e.check_in_at, e.check_out_at);
+
+                return (
+                  <div key={e.id} className="workerEntryCard">
+                    <div className="workerEntryTitle">Tramo {idx + 1}</div>
+
+                    <div className="workerEntryGrid">
+                      <div className="workerEntryMini">
+                        <div className="workerEntryMiniLabel">Entrada</div>
+                        <div className="workerEntryMiniValue">{formatHHMM(e.check_in_at)}</div>
+                      </div>
+
+                      <div className="workerEntryMini">
+                        <div className="workerEntryMiniLabel">Salida</div>
+                        <div className="workerEntryMiniValue">
+                          {e.check_out_at ? formatHHMM(e.check_out_at) : "—"}
+                        </div>
+                      </div>
+
+                      <div className="workerEntryMini">
+                        <div className="workerEntryMiniLabel">Tiempo</div>
+                        <div className="workerEntryMiniValue">{hhmmFromMinutes(mins)}</div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+
+              {todayEntries.length > 2 && (
+                <div className="workerMuted">
+                  (Hay más tramos hoy. Se verán en “Histórico”.)
+                </div>
+              )}
+            </div>
+          )}
+        </section>
+
+        <section className="workerCard workerBottomCard">
+          <IconButton
+            title="Ajustes"
+            onClick={() => setShowAdjust((s) => !s)}
+            disabled={isAdjustBlocked}
+          >
+            <SettingsIcon />
+          </IconButton>
+
+          <IconButton title="Histórico" onClick={() => navigate("/worker/history")}>
+            <HistoryIcon />
+          </IconButton>
+
+          <IconButton title="Salir" onClick={() => supabase.auth.signOut()}>
+            <LogoutIcon />
+          </IconButton>
+        </section>
+
+        {showAdjust && (
+          <section className="workerCard workerAdjustCard">
+            <div className="workerAdjustTitle">
+              {requiresNewProposal ? "Enviar nueva propuesta" : "Solicitar ajuste"}
+            </div>
+
+            <div className="workerAdjustHelp">{adjustmentHelpText}</div>
+
+            <input
+              className="workerAdjustInput"
+              value={adjustReason}
+              onChange={(e) => setAdjustReason(e.target.value)}
+              placeholder={
+                requiresNewProposal
+                  ? "Explica la nueva propuesta (obligatorio)"
+                  : openEntry
+                  ? "Ejemplo: olvidé fichar salida y solicito regularización"
+                  : "Ejemplo: olvidé fichar correctamente este tramo"
+              }
+            />
+
+            <button
+              className="workerAdjustBtn"
+              onClick={onSubmitAdjustment}
+              disabled={createAdjustment.isPending || adjustReason.trim().length < 3}
+            >
+              {createAdjustment.isPending
+                ? "Enviando…"
+                : requiresNewProposal
+                ? "Enviar nueva propuesta"
+                : "Enviar"}
+            </button>
+
+            {createAdjustment.error && (
+              <div className="workerErrorText">
+                {(createAdjustment.error as any)?.message ?? "Error"}
+              </div>
+            )}
+
+            {createAdjustment.isSuccess && (
+              <div className="workerSuccessText">
+				Tu solicitud de ajuste se ha enviado correctamente. El administrador la revisará.
+			  </div>
+            )}
+          </section>
+        )}
+      </div>
     </div>
   );
 }
+
+
+
