@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabaseClient";
 import { useActiveMembership } from "../app/useActiveMembership";
 
@@ -267,7 +266,7 @@ function getInspectionExportRow(r: PreviewRow) {
 // ======================================================
 
 export function AdminExportsPage() {
-  const navigate = useNavigate();
+  
   const { membership, loading: membershipLoading } = useActiveMembership();
 
   const today = useMemo(() => new Date(), []);
@@ -279,7 +278,6 @@ export function AdminExportsPage() {
   const [previewLoading, setPreviewLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [profiles, setProfiles] = useState<Profile[]>([]);
   const [previewRows, setPreviewRows] = useState<PreviewRow[]>([]);
   const [selectedExportType, setSelectedExportType] = useState<ExportType>("inspection");
   const [selectedWorkerId, setSelectedWorkerId] = useState<string>("all");
@@ -449,7 +447,6 @@ export function AdminExportsPage() {
     }
 
     const nextProfiles = (profilesData ?? []) as Profile[];
-    setProfiles(nextProfiles);
 
     const profilesById: Record<string, Profile> = {};
     for (const p of nextProfiles) profilesById[p.id] = p;

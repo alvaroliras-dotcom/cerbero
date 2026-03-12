@@ -29,7 +29,7 @@ export function useRegisterPushDevice(enabled: boolean = true) {
         if (cancelled) return;
 
         await savePushDevice({
-          companyId: membership.company_id,
+          companyId: membership?.company_id ?? "",
           userId: authData.user.id,
           deviceToken: token,
         });
