@@ -29,10 +29,18 @@ Deno.serve(async () => {
     }
   );
 
+  const { data: missingLunchCheckin } = await supabase.rpc(
+    "get_missing_lunch_checkin_notifications",
+    {
+      p_company_id: "2cff6a40-94d8-4166-bb6f-5e1f46e0e9be",
+    }
+  );
+
   const allCandidates = [
     ...(longOpen ?? []),
     ...(missingCheckin ?? []),
     ...(missingLunchCheckout ?? []),
+    ...(missingLunchCheckin ?? []),
   ];
 
   for (const item of allCandidates) {
@@ -41,6 +49,8 @@ Deno.serve(async () => {
         ? "Todavía no has fichado tu entrada."
         : item.notification_type === "missing_lunch_checkout_warning_1"
         ? "Puede que hayas olvidado fichar la salida de comida."
+        : item.notification_type === "missing_lunch_checkin_warning_1"
+        ? "Puede que hayas olvidado fichar la vuelta de comida."
         : "Llevas muchas horas con la jornada abierta. Revisa si falta fichar la salida.";
 
     const res = await fetch(
@@ -49,8 +59,10 @@ Deno.serve(async () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "apikey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRvb2xkamNhYXNmcm10b3pjeXlxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk1MTg3ODgsImV4cCI6MjA4NTA5NDc4OH0.T0KruRRY4FjFoKnitIsEReuemZBLpnxm_R90nAfhU00",
-          "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6ImFub24iLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRvb2xkamNhYXNmcm10b3pjeXlxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk1MTg3ODgsImV4cCI6MjA4NTA5NDc4OH0.T0KruRRY4FjFoKnitIsEReuemZBLpnxm_R90nAfhU00",
+          "apikey":
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRvb2xkamNhYXNmcm10b3pjeXlxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk1MTg3ODgsImV4cCI6MjA4NTA5NDc4OH0.T0KruRRY4FjFoKnitIsEReuemZBLpnxm_R90nAfhU00",
+          "Authorization":
+            "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRvb2xkamNhYXNmcm10b3pjeXlxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk1MTg3ODgsImV4cCI6MjA4NTA5NDc4OH0.T0KruRRY4FjFoKnitIsEReuemZBLpnxm_R90nAfhU00",
         },
         body: JSON.stringify({
           company_id: item.company_id,
