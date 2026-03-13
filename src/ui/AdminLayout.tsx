@@ -1,6 +1,5 @@
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import CerberoLogo from "../assets/LOGOTIPO-CERBERO.svg";
-import SolventoLogo from "../assets/LOGOTIPO-SOLVENTO-COLOR.svg";
+import { adminTheme } from "./adminTheme";
 
 // ======================================================
 // PARTE 1/5 — TIPOS Y METADATOS
@@ -177,9 +176,9 @@ export function AdminLayout() {
       <style>{`
         .cerbAdmRoot {
           min-height: 100vh;
-          background: #0b1416;
-          color: #eef2f7;
-          padding: 16px;
+          background: ${adminTheme.colors.appBg};
+          color: ${adminTheme.colors.text};
+          padding: ${adminTheme.layout.pagePadding};
         }
 
         .cerbAdmRoot * {
@@ -187,42 +186,50 @@ export function AdminLayout() {
         }
 
         .cerbAdmShell {
-          max-width: 1600px;
+          max-width: ${adminTheme.layout.maxWidth};
           margin: 0 auto;
           display: grid;
-          grid-template-columns: 170px minmax(0, 1fr);
-          gap: 16px;
+          grid-template-columns: ${adminTheme.layout.sidebarWidth} minmax(0, 1fr);
+          gap: ${adminTheme.layout.sectionGap};
           align-items: start;
         }
 
         .cerbAdmSidebar {
           min-height: calc(100vh - 32px);
-          border: 1px solid rgba(255,255,255,.10);
+          border: 1px solid ${adminTheme.colors.border};
           border-radius: 18px;
-          background: #111c1f;
+          background: ${adminTheme.colors.panelBg};
           padding: 14px;
           display: flex;
           flex-direction: column;
           gap: 12px;
+          box-shadow: ${adminTheme.shadow.sm};
         }
 
         .cerbAdmNavBtn {
           width: 100%;
           height: 56px;
-          border: 1px solid rgba(255,255,255,.10);
+          border: 1px solid ${adminTheme.colors.border};
           border-radius: 14px;
-          background: #162427;
-          color: #eef2f7;
+          background: ${adminTheme.colors.panelSoft};
+          color: ${adminTheme.colors.textSoft};
           display: flex;
           align-items: center;
           justify-content: center;
           cursor: pointer;
           flex: 0 0 auto;
+          transition: background .18s ease, border-color .18s ease, color .18s ease;
+        }
+
+        .cerbAdmNavBtn:hover {
+          background: ${adminTheme.colors.panelAlt};
+          color: ${adminTheme.colors.text};
         }
 
         .cerbAdmNavBtn.isActive {
-          background: #1f4f52;
-          border-color: #4bada9;
+          background: ${adminTheme.colors.primarySoft};
+          border-color: ${adminTheme.colors.primary};
+          color: ${adminTheme.colors.primary};
         }
 
         .cerbAdmSidebarSpacer {
@@ -230,7 +237,7 @@ export function AdminLayout() {
         }
 
         .cerbAdmSidebarBrand {
-          border-top: 1px solid rgba(255,255,255,.10);
+          border-top: 1px solid ${adminTheme.colors.border};
           padding-top: 14px;
           display: flex;
           flex-direction: column;
@@ -248,7 +255,7 @@ export function AdminLayout() {
 
         .cerbAdmVersion {
           font-size: 11px;
-          color: rgba(255,255,255,.65);
+          color: ${adminTheme.colors.textMuted};
           font-weight: 700;
         }
 
@@ -256,23 +263,24 @@ export function AdminLayout() {
           min-width: 0;
           display: flex;
           flex-direction: column;
-          gap: 12px;
+          gap: ${adminTheme.layout.sectionGap};
         }
 
         .cerbAdmHeader {
-          height: 64px;
-          min-height: 64px;
-          max-height: 64px;
+          height: ${adminTheme.layout.headerHeight};
+          min-height: ${adminTheme.layout.headerHeight};
+          max-height: ${adminTheme.layout.headerHeight};
           overflow: hidden;
-          border: 1px solid rgba(255,255,255,.10);
+          border: 1px solid ${adminTheme.colors.border};
           border-radius: 18px;
-          background: #111c1f;
+          background: ${adminTheme.colors.panelBg};
           padding: 8px 18px;
           display: flex;
           align-items: center;
           justify-content: space-between;
           gap: 16px;
           flex: 0 0 auto;
+          box-shadow: ${adminTheme.shadow.sm};
         }
 
         .cerbAdmHeaderText {
@@ -288,6 +296,7 @@ export function AdminLayout() {
           font-size: 18px;
           line-height: 1;
           font-weight: 800;
+          color: ${adminTheme.colors.text};
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
@@ -297,7 +306,7 @@ export function AdminLayout() {
           margin: 0;
           font-size: 11px;
           line-height: 1;
-          color: rgba(255,255,255,.70);
+          color: ${adminTheme.colors.textSoft};
           font-weight: 600;
           white-space: nowrap;
           overflow: hidden;
@@ -324,7 +333,7 @@ export function AdminLayout() {
           min-width: 0;
           display: flex;
           flex-direction: column;
-          gap: 12px;
+          gap: ${adminTheme.layout.sectionGap};
         }
 
         @media (max-width: 1100px) {
@@ -394,7 +403,11 @@ export function AdminLayout() {
           <div className="cerbAdmSidebarSpacer" />
 
           <div className="cerbAdmSidebarBrand">
-            <img className="cerbAdmCerberoLogo" src={CerberoLogo} alt="Cerbero" />
+            <img
+              className="cerbAdmCerberoLogo"
+              src={adminTheme.logos.secondary}
+              alt="Cerbero"
+            />
             <div className="cerbAdmVersion">v1.0</div>
           </div>
         </aside>
@@ -407,7 +420,11 @@ export function AdminLayout() {
             </div>
 
             <div className="cerbAdmHeaderLogoWrap">
-              <img className="cerbAdmSolventoLogo" src={SolventoLogo} alt="Solvento" />
+              <img
+                className="cerbAdmSolventoLogo"
+                src={adminTheme.logos.main}
+                alt={adminTheme.brandName}
+              />
             </div>
           </header>
 

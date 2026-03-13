@@ -6,40 +6,41 @@ Deno.serve(async () => {
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
   );
 
-  const results = [];
+  const companyId = "2cff6a40-94d8-4166-bb6f-5e1f46e0e9be";
+  const results: Array<Record<string, unknown>> = [];
 
   const { data: longOpen } = await supabase.rpc(
     "get_long_open_shift_notifications",
     {
-      p_company_id: "2cff6a40-94d8-4166-bb6f-5e1f46e0e9be",
+      p_company_id: companyId,
     }
   );
 
   const { data: missingCheckin } = await supabase.rpc(
     "get_missing_checkin_notifications",
     {
-      p_company_id: "2cff6a40-94d8-4166-bb6f-5e1f46e0e9be",
+      p_company_id: companyId,
     }
   );
 
   const { data: missingLunchCheckout } = await supabase.rpc(
     "get_missing_lunch_checkout_notifications",
     {
-      p_company_id: "2cff6a40-94d8-4166-bb6f-5e1f46e0e9be",
+      p_company_id: companyId,
     }
   );
 
   const { data: missingLunchCheckin } = await supabase.rpc(
     "get_missing_lunch_checkin_notifications",
     {
-      p_company_id: "2cff6a40-94d8-4166-bb6f-5e1f46e0e9be",
+      p_company_id: companyId,
     }
   );
 
   const { data: missingFinalCheckout } = await supabase.rpc(
     "get_missing_final_checkout_notifications",
     {
-      p_company_id: "2cff6a40-94d8-4166-bb6f-5e1f46e0e9be",
+      p_company_id: companyId,
     }
   );
 
@@ -55,6 +56,8 @@ Deno.serve(async () => {
     const body =
       item.notification_type === "missing_checkin_warning_1"
         ? "Todavía no has fichado tu entrada."
+        : item.notification_type === "missing_checkin_warning_2"
+        ? "Segundo aviso: sigue sin constar tu fichaje de entrada."
         : item.notification_type === "missing_lunch_checkout_warning_1"
         ? "Puede que hayas olvidado fichar la salida de comida."
         : item.notification_type === "missing_lunch_checkin_warning_1"
@@ -89,9 +92,49 @@ Deno.serve(async () => {
     const text = await res.text();
 
     results.push({
+      stage: "push",
+      notification_type: item.notification_type,
+      user_id: item.user_id,
       status: res.status,
       body: text,
     });
+  }
+
+  const now = new Date();
+  const hh = now.getHours();
+  const mm = now.getMinutes();
+
+  const isMissingCheckinIncidentWindow = hh === 9 && mm >= 15;
+
+  if (isMissingCheckinIncidentWindow) {
+    const { data: incidentCandidates } = await supabase.rpc(
+      "get_missing_checkin_notifications",
+      {
+        p_company_id: companyId,
+      }
+    );
+
+    const finalIncidentCandidates = (incidentCandidates ?? []).filter(
+      (item: any) => item.notification_type === "missing_checkin_warning_2"
+    );
+
+    for (const item of finalIncidentCandidates) {
+      const { error } = await supabase.rpc(
+        "create_missing_checkin_incident",
+        {
+          p_company_id: item.company_id,
+          p_user_id: item.user_id,
+        }
+      );
+
+      results.push({
+        stage: "incident_escalation",
+        notification_type: "missing_checkin_incident",
+        user_id: item.user_id,
+        ok: !error,
+        error: error?.message ?? null,
+      });
+    }
   }
 
   return new Response(
