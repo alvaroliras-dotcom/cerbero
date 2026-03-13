@@ -162,9 +162,9 @@ export function AdminIncidentsPage() {
     return userId;
   }
 
-  // ======================================================
-  // PARTE 3/6 — CARGA Y ACCIONES
-  // ======================================================
+// ======================================================
+// PARTE 3/6 — CARGA Y ACCIONES
+// ======================================================
 
   async function loadResolutionStats() {
     if (!membership) return;
@@ -286,18 +286,69 @@ export function AdminIncidentsPage() {
         incident_closed_from_backoffice: true,
       };
 
+      const previousCheckOutAt =
+        selectedEntryGeo?.flags?.admin_new_check_out_at ?? selectedIncident.proposed_check_out;
+
+      const { data: authData } = await supabase.auth.getUser();
+      const adminUserId = authData.user?.id ?? null;
+
+      const nextResolvedCheckOutAt =
+        decision === "validated" && finalCheckOut
+          ? new Date(finalCheckOut).toISOString()
+          : previousCheckOutAt;
+
+      const updatePayload: Record<string, any> = {
+        workflow_status: decision === "validated" ? "adjusted" : "rejected",
+        flags: {
+          ...nextFlags,
+          admin_old_check_out_at: previousCheckOutAt ?? null,
+          admin_new_check_out_at:
+            decision === "validated" ? nextResolvedCheckOutAt ?? null : null,
+        },
+      };
+
+      if (decision === "validated" && finalCheckOut) {
+        updatePayload.check_out_at = new Date(finalCheckOut).toISOString();
+      }
+
       const { error } = await supabase
         .from("time_entries")
-        .update({
-          workflow_status: decision === "validated" ? "adjusted" : "rejected",
-          flags: nextFlags,
-        })
+        .update(updatePayload)
         .eq("id", selectedIncident.time_entry_id);
+
+      if (error) {
+        setResolving(false);
+        alert(error.message);
+        return;
+      }
+
+      const { error: logError } = await supabase.from("time_entry_logs").insert({
+        company_id: membership?.company_id,
+        time_entry_id: selectedIncident.time_entry_id,
+        action:
+          decision === "validated"
+            ? "automatic_incident_validated"
+            : "automatic_incident_rejected",
+        performed_by: adminUserId,
+        performed_role: "admin",
+        old_values: {
+          check_out_at: previousCheckOutAt ?? null,
+          workflow_status: "pending",
+        },
+        new_values: {
+          check_out_at:
+            decision === "validated"
+              ? nextResolvedCheckOutAt ?? null
+              : previousCheckOutAt ?? null,
+          workflow_status: decision === "validated" ? "adjusted" : "rejected",
+          resolution_reason: reason,
+        },
+      });
 
       setResolving(false);
 
-      if (error) {
-        alert(error.message);
+      if (logError) {
+        alert(logError.message);
         return;
       }
 
@@ -332,9 +383,7 @@ export function AdminIncidentsPage() {
     setSelectedEntryGeo(null);
     setLoadingEntryGeo(true);
     setResolutionReason("");
-    setFinalCheckOut(
-      item.source_type === "manual" ? item.proposed_check_out?.slice(0, 16) || "" : ""
-    );
+    setFinalCheckOut(item.proposed_check_out?.slice(0, 16) || "");
 
     const { data, error } = await supabase
       .from("time_entries")
@@ -943,17 +992,15 @@ export function AdminIncidentsPage() {
               </div>
             </div>
 
-            {!isAutomaticIncident(selectedIncident) && (
-              <div className="adminIncModalBlock" style={{ marginBottom: 14 }}>
-                <div className="adminIncModalLabel">Salida final</div>
-                <input
-                  className="adminIncModalInput"
-                  type="datetime-local"
-                  value={finalCheckOut}
-                  onChange={(e) => setFinalCheckOut(e.target.value)}
-                />
-              </div>
-            )}
+            <div className="adminIncModalBlock" style={{ marginBottom: 14 }}>
+			  <div className="adminIncModalLabel">Hora final corregida (opcional)</div>
+				  <input
+					className="adminIncModalInput"
+					type="datetime-local"
+					value={finalCheckOut}
+					onChange={(e) => setFinalCheckOut(e.target.value)}
+				  />
+			</div>
 
             <div className="adminIncModalGrid">
               <div className="adminIncModalBlock">
