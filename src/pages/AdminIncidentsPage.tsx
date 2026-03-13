@@ -146,7 +146,10 @@ export function AdminIncidentsPage() {
   const [selectedEntryGeo, setSelectedEntryGeo] = useState<EntryGeoDetail | null>(null);
   const [loadingEntryGeo, setLoadingEntryGeo] = useState(false);
   const [resolutionReason, setResolutionReason] = useState("");
+
+  const [finalCheckIn, setFinalCheckIn] = useState("");
   const [finalCheckOut, setFinalCheckOut] = useState("");
+
   const [resolving, setResolving] = useState(false);
 
   const [validatedToday, setValidatedToday] = useState(0);
@@ -161,7 +164,6 @@ export function AdminIncidentsPage() {
     if (email) return email;
     return userId;
   }
-
 // ======================================================
 // PARTE 3/6 — CARGA Y ACCIONES
 // ======================================================
@@ -241,25 +243,18 @@ export function AdminIncidentsPage() {
         source_type: "automatic",
       })) ?? [];
 
-    const nextIncidents = [...manual, ...auto];
-    setIncidents(nextIncidents);
+    setIncidents([...manual, ...auto]);
 
-    const { data: profilesData, error: profilesError } = await supabase.rpc(
-      "admin_company_profiles",
-      {
-        p_company_id: membership.company_id,
-      }
-    );
+    const { data: profilesData } = await supabase.rpc("admin_company_profiles", {
+      p_company_id: membership.company_id,
+    });
 
-    if (!profilesError && profilesData) {
-      const map: Record<string, Profile> = {};
-      for (const profile of profilesData as Profile[]) {
-        map[profile.id] = profile;
-      }
-      setProfilesById(map);
-    } else {
-      setProfilesById({});
+    const map: Record<string, Profile> = {};
+    for (const p of (profilesData ?? []) as Profile[]) {
+      map[p.id] = p;
     }
+
+    setProfilesById(map);
 
     await loadResolutionStats();
     setLoading(false);
@@ -278,37 +273,33 @@ export function AdminIncidentsPage() {
     setResolving(true);
 
     if (isAutomaticIncident(selectedIncident)) {
+      const previousCheckOutAt =
+        selectedEntryGeo?.flags?.admin_new_check_out_at ?? selectedIncident.proposed_check_out;
+
       const nextFlags = {
         ...(selectedEntryGeo?.flags ?? {}),
-        admin_resolution_decision: decision === "validated" ? "validated" : "rejected",
+        admin_resolution_decision: decision,
         admin_resolution_reason: reason,
         admin_resolution_at: new Date().toISOString(),
         incident_closed_from_backoffice: true,
       };
 
-      const previousCheckOutAt =
-        selectedEntryGeo?.flags?.admin_new_check_out_at ?? selectedIncident.proposed_check_out;
-
       const { data: authData } = await supabase.auth.getUser();
       const adminUserId = authData.user?.id ?? null;
 
-      const nextResolvedCheckOutAt =
-        decision === "validated" && finalCheckOut
-          ? new Date(finalCheckOut).toISOString()
-          : previousCheckOutAt;
-
       const updatePayload: Record<string, any> = {
         workflow_status: decision === "validated" ? "adjusted" : "rejected",
-        flags: {
-          ...nextFlags,
-          admin_old_check_out_at: previousCheckOutAt ?? null,
-          admin_new_check_out_at:
-            decision === "validated" ? nextResolvedCheckOutAt ?? null : null,
-        },
+        flags: nextFlags,
       };
 
-      if (decision === "validated" && finalCheckOut) {
-        updatePayload.check_out_at = new Date(finalCheckOut).toISOString();
+      if (decision === "validated") {
+        if (finalCheckIn) {
+          updatePayload.check_in_at = new Date(finalCheckIn).toISOString();
+        }
+
+        if (finalCheckOut) {
+          updatePayload.check_out_at = new Date(finalCheckOut).toISOString();
+        }
       }
 
       const { error } = await supabase
@@ -322,7 +313,7 @@ export function AdminIncidentsPage() {
         return;
       }
 
-      const { error: logError } = await supabase.from("time_entry_logs").insert({
+      await supabase.from("time_entry_logs").insert({
         company_id: membership?.company_id,
         time_entry_id: selectedIncident.time_entry_id,
         action:
@@ -332,26 +323,23 @@ export function AdminIncidentsPage() {
         performed_by: adminUserId,
         performed_role: "admin",
         old_values: {
-          check_out_at: previousCheckOutAt ?? null,
+          check_in_at: selectedIncident.check_in_at,
+          check_out_at: previousCheckOutAt,
           workflow_status: "pending",
         },
         new_values: {
-          check_out_at:
-            decision === "validated"
-              ? nextResolvedCheckOutAt ?? null
-              : previousCheckOutAt ?? null,
+          check_in_at: finalCheckIn
+            ? new Date(finalCheckIn).toISOString()
+            : selectedIncident.check_in_at,
+          check_out_at: finalCheckOut
+            ? new Date(finalCheckOut).toISOString()
+            : previousCheckOutAt,
           workflow_status: decision === "validated" ? "adjusted" : "rejected",
           resolution_reason: reason,
         },
       });
 
       setResolving(false);
-
-      if (logError) {
-        alert(logError.message);
-        return;
-      }
-
       closeIncidentModal();
       await loadIncidents();
       return;
@@ -383,6 +371,8 @@ export function AdminIncidentsPage() {
     setSelectedEntryGeo(null);
     setLoadingEntryGeo(true);
     setResolutionReason("");
+
+    setFinalCheckIn(item.check_in_at?.slice(0, 16) || "");
     setFinalCheckOut(item.proposed_check_out?.slice(0, 16) || "");
 
     const { data, error } = await supabase
@@ -407,6 +397,7 @@ export function AdminIncidentsPage() {
     setSelectedEntryGeo(null);
     setLoadingEntryGeo(false);
     setResolutionReason("");
+    setFinalCheckIn("");
     setFinalCheckOut("");
   }
 
