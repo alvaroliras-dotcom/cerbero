@@ -36,11 +36,19 @@ Deno.serve(async () => {
     }
   );
 
+  const { data: missingFinalCheckout } = await supabase.rpc(
+    "get_missing_final_checkout_notifications",
+    {
+      p_company_id: "2cff6a40-94d8-4166-bb6f-5e1f46e0e9be",
+    }
+  );
+
   const allCandidates = [
     ...(longOpen ?? []),
     ...(missingCheckin ?? []),
     ...(missingLunchCheckout ?? []),
     ...(missingLunchCheckin ?? []),
+    ...(missingFinalCheckout ?? []),
   ];
 
   for (const item of allCandidates) {
@@ -51,6 +59,8 @@ Deno.serve(async () => {
         ? "Puede que hayas olvidado fichar la salida de comida."
         : item.notification_type === "missing_lunch_checkin_warning_1"
         ? "Puede que hayas olvidado fichar la vuelta de comida."
+        : item.notification_type === "missing_final_checkout_warning_1"
+        ? "Puede que hayas olvidado fichar tu salida final."
         : "Llevas muchas horas con la jornada abierta. Revisa si falta fichar la salida.";
 
     const res = await fetch(
