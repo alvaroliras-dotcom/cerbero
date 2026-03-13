@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabaseClient";
 import { useActiveMembership } from "../app/useActiveMembership";
+import { adminTheme } from "../ui/adminTheme";
 
 // ======================================================
 // PARTE 1/6 — TIPOS Y HELPERS
@@ -823,225 +824,232 @@ export function AdminPage() {
   return (
     <div className="adminPageUi">
       <style>{`
-        .adminPageUi {
-          display: grid;
-          gap: 12px;
-        }
+  .adminPageUi {
+    display: grid;
+    gap: 12px;
+  }
 
-        .adminFilters {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 8px;
-          align-items: center;
-        }
+  .adminFilters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+  }
 
-        .adminPill {
-          height: 40px;
-          padding: 0 14px;
-          border: 1px solid rgba(255,255,255,.12);
-          border-radius: 12px;
-          background: #162427;
-          color: #eef2f7;
-          font-weight: 700;
-          cursor: pointer;
-        }
+  .adminPill {
+    height: 40px;
+    padding: 0 14px;
+    border: 1px solid ${adminTheme.colors.border};
+    border-radius: 12px;
+    background: ${adminTheme.colors.panelSoft};
+    color: ${adminTheme.colors.text};
+    font-weight: 700;
+    cursor: pointer;
+  }
 
-        .adminPill.active {
-          background: #1f4f52;
-          border-color: #4bada9;
-        }
+  .adminPill.active {
+    background: ${adminTheme.colors.primarySoft};
+    border-color: ${adminTheme.colors.primary};
+    color: ${adminTheme.colors.primary};
+  }
 
-        .adminField {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          height: 40px;
-          padding: 0 12px;
-          border: 1px solid rgba(255,255,255,.12);
-          border-radius: 12px;
-          background: #10191b;
-        }
+  .adminField {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 40px;
+    padding: 0 12px;
+    border: 1px solid ${adminTheme.colors.border};
+    border-radius: 12px;
+    background: ${adminTheme.colors.panelBg};
+  }
 
-        .adminField label {
-          font-size: 12px;
-          color: rgba(255,255,255,.70);
-          font-weight: 700;
-        }
+  .adminField label {
+    font-size: 12px;
+    color: ${adminTheme.colors.textSoft};
+    font-weight: 700;
+  }
 
-        .adminField input {
-          background: transparent;
-          border: none;
-          outline: none;
-          color: #eef2f7;
-          font-weight: 700;
-        }
+  .adminField input {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: ${adminTheme.colors.text};
+    font-weight: 700;
+  }
 
-        .adminBtn {
-          height: 40px;
-          padding: 0 16px;
-          border: 1px solid rgba(255,255,255,.12);
-          border-radius: 12px;
-          background: #162427;
-          color: #eef2f7;
-          font-weight: 700;
-          cursor: pointer;
-        }
+  .adminBtn {
+    height: 40px;
+    padding: 0 16px;
+    border: 1px solid ${adminTheme.colors.border};
+    border-radius: 12px;
+    background: ${adminTheme.colors.panelSoft};
+    color: ${adminTheme.colors.text};
+    font-weight: 700;
+    cursor: pointer;
+  }
 
-        .adminBtn.primary {
-          background: #4bada9;
-          color: #071012;
-          border-color: #4bada9;
-        }
+  .adminBtn.primary {
+    background: ${adminTheme.colors.primary};
+    color: ${adminTheme.colors.textOnPrimary};
+    border-color: ${adminTheme.colors.primary};
+  }
 
-        .adminBtn.danger {
-          background: #7f1d1d;
-          color: white;
-          border-color: #991b1b;
-        }
+  .adminBtn.danger {
+    background: ${adminTheme.colors.danger};
+    color: white;
+    border-color: ${adminTheme.colors.dangerHover};
+  }
 
-        .adminBadge {
-          height: 40px;
-          padding: 0 14px;
-          display: inline-flex;
-          align-items: center;
-          border: 1px solid rgba(255,255,255,.12);
-          border-radius: 12px;
-          background: #10191b;
-          color: rgba(255,255,255,.80);
-          font-size: 13px;
-          font-weight: 700;
-        }
+  .adminBadge {
+    height: 40px;
+    padding: 0 14px;
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid ${adminTheme.colors.border};
+    border-radius: 12px;
+    background: ${adminTheme.colors.panelBg};
+    color: ${adminTheme.colors.textSoft};
+    font-size: 13px;
+    font-weight: 700;
+  }
 
-        .adminKpiGrid {
-          display: grid;
-          grid-template-columns: repeat(5, minmax(0, 1fr));
-          gap: 12px;
-        }
+  .adminKpiGrid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 12px;
+  }
 
-        .adminKpi {
-          border: 1px solid rgba(255,255,255,.10);
-          border-radius: 18px;
-          background: #111c1f;
-          padding: 16px;
-        }
+  .adminKpi {
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 18px;
+    background: #0f2024;
+    padding: 16px;
+  }
 
-        .adminKpiLabel {
-          font-size: 13px;
-          font-weight: 700;
-          color: rgba(255,255,255,.70);
-        }
+  .adminKpiLabel {
+    font-size: 13px;
+    font-weight: 700;
+    color: rgba(255,255,255,.78);
+  }
 
-        .adminKpiValue {
-          margin-top: 8px;
-          font-size: 26px;
-          font-weight: 800;
-          color: #eef2f7;
-        }
+  .adminKpiValue {
+    margin-top: 8px;
+    font-size: 26px;
+    font-weight: 800;
+    color: #ffffff;
+  }
 
-        .adminGrid {
-          display: grid;
-          grid-template-columns: 1.55fr 1fr;
-          gap: 12px;
-          align-items: start;
-        }
+  .adminGrid {
+    display: grid;
+    grid-template-columns: 1.55fr 1fr;
+    gap: 12px;
+    align-items: start;
+  }
 
-        .adminCol {
-          display: grid;
-          gap: 12px;
-        }
+  .adminCol {
+    display: grid;
+    gap: 12px;
+  }
 
-        .adminCard {
-          border: 1px solid rgba(255,255,255,.10);
-          border-radius: 18px;
-          background: #111c1f;
-          padding: 16px;
-        }
+  .adminCard {
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 18px;
+    background: #0f2024;
+    padding: 16px;
+  }
 
-        .adminCardTitle {
-          margin: 0;
-          font-size: 18px;
-          font-weight: 800;
-        }
+  .adminCardTitle {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 800;
+    color: #ffffff;
+  }
 
-        .adminCardSub {
-          margin: 4px 0 0 0;
-          font-size: 13px;
-          font-weight: 600;
-          color: rgba(255,255,255,.70);
-        }
+  .adminCardSub {
+    margin: 4px 0 0 0;
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255,255,255,.78);
+  }
 
-        .adminNotice {
-          margin-top: 12px;
-          padding: 12px;
-          border-radius: 12px;
-          background: #3b1014;
-          color: #ffd7d7;
-          border: 1px solid #7f1d1d;
-          font-weight: 700;
-        }
+  .adminNotice {
+    margin-top: 12px;
+    padding: 12px;
+    border-radius: 12px;
+    background: #3b1014;
+    color: #ffd7d7;
+    border: 1px solid #7f1d1d;
+    font-weight: 700;
+  }
 
-        .adminTableWrap {
-          margin-top: 12px;
-          overflow: auto;
-          border: 1px solid rgba(255,255,255,.10);
-          border-radius: 14px;
-          background: #0d1517;
-        }
+  .adminTableWrap {
+    margin-top: 12px;
+    overflow: auto;
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 14px;
+    background: #0b171b;
+  }
 
-        .adminTable {
-          width: 100%;
-          border-collapse: collapse;
-        }
+  .adminTable {
+    width: 100%;
+    border-collapse: collapse;
+  }
 
-        .adminTable th,
-        .adminTable td {
-          padding: 12px;
-          text-align: left;
-          border-bottom: 1px solid rgba(255,255,255,.08);
-          font-size: 14px;
-        }
+  .adminTable th,
+  .adminTable td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255,255,255,.10);
+    font-size: 14px;
+    color: #f8fafc;
+  }
 
-        .adminTable th {
-          color: rgba(255,255,255,.75);
-          font-weight: 800;
-        }
+  .adminTable th {
+    color: rgba(255,255,255,.82);
+    font-weight: 800;
+  }
 
-        .adminRight {
-          text-align: right;
-        }
+  .adminRight {
+    text-align: right;
+  }
 
-        .adminSearchRow,
-        .adminResolveRow {
-          margin-top: 12px;
-          display: flex;
-          flex-wrap: wrap;
-          gap: 8px;
-          align-items: center;
-        }
+  .adminSearchRow,
+  .adminResolveRow {
+    margin-top: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+  }
 
-        .adminInput {
-          flex: 1;
-          min-width: 220px;
-          height: 40px;
-          padding: 0 12px;
-          border: 1px solid rgba(255,255,255,.12);
-          border-radius: 12px;
-          background: #10191b;
-          color: #eef2f7;
-          outline: none;
-          font-weight: 700;
-        }
+  .adminInput {
+    flex: 1;
+    min-width: 220px;
+    height: 40px;
+    padding: 0 12px;
+    border: 1px solid rgba(255,255,255,.10);
+    border-radius: 12px;
+    background: #0b171b;
+    color: #ffffff;
+    outline: none;
+    font-weight: 700;
+  }
 
-        @media (max-width: 1200px) {
-          .adminKpiGrid {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-          }
+  .adminInput::placeholder {
+    color: rgba(255,255,255,.55);
+  }
 
-          .adminGrid {
-            grid-template-columns: 1fr;
-          }
-        }
-      `}</style>
+  @media (max-width: 1200px) {
+    .adminKpiGrid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .adminGrid {
+      grid-template-columns: 1fr;
+    }
+  }
+`}</style>
 
       <section className="adminFilters">
         <button
