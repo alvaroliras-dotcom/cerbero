@@ -983,14 +983,33 @@ export function AdminIncidentsPage() {
               </div>
             </div>
 
-            <div className="adminIncModalBlock" style={{ marginBottom: 14 }}>
-			  <div className="adminIncModalLabel">Hora final corregida (opcional)</div>
-				  <input
-					className="adminIncModalInput"
-					type="datetime-local"
-					value={finalCheckOut}
-					onChange={(e) => setFinalCheckOut(e.target.value)}
-				  />
+            <div
+			  style={{
+				display: "grid",
+				gridTemplateColumns: "1fr 1fr",
+				gap: 12,
+				marginBottom: 14,
+			  }}
+			>
+			  <div className="adminIncModalBlock">
+				<div className="adminIncModalLabel">Hora entrada corregida</div>
+				<input
+				  className="adminIncModalInput"
+				  type="datetime-local"
+				  value={finalCheckIn}
+				  onChange={(e) => setFinalCheckIn(e.target.value)}
+				/>
+			  </div>
+
+			  <div className="adminIncModalBlock">
+				<div className="adminIncModalLabel">Hora salida corregida</div>
+				<input
+				  className="adminIncModalInput"
+				  type="datetime-local"
+				  value={finalCheckOut}
+				  onChange={(e) => setFinalCheckOut(e.target.value)}
+				/>
+			  </div>
 			</div>
 
             <div className="adminIncModalGrid">
