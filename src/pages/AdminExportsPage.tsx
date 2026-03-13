@@ -85,6 +85,13 @@ function formatLocalDateTime(iso: string) {
   return `${pad2(d.getDate())}/${pad2(d.getMonth() + 1)}/${d.getFullYear()} ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
 }
 
+function formatOptionalLocalDateTime(value: unknown) {
+  if (typeof value !== "string" || !value) return "";
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return "";
+  return formatLocalDateTime(value);
+}
+
 function safeDurationMinutes(checkInIso: string, checkOutIso: string | null) {
   if (!checkOutIso) return 0;
   const inMs = new Date(checkInIso).getTime();
@@ -218,24 +225,35 @@ function getInspectionReason(row: PreviewRow) {
   );
 }
 
-function getAdminResolutionText(row: PreviewRow) {
+function getAdminResolutionDecision(row: PreviewRow) {
   const flags = row.flags ?? {};
-  const decision =
-    flags?.admin_resolution_decision === "validated"
-      ? "Validada"
-      : flags?.admin_resolution_decision === "rejected"
-      ? "Rechazada"
-      : "";
+  return flags?.admin_resolution_decision === "validated"
+    ? "Validada"
+    : flags?.admin_resolution_decision === "rejected"
+    ? "Rechazada"
+    : "";
+}
 
-  const reason =
-    typeof flags?.admin_resolution_reason === "string"
-      ? flags.admin_resolution_reason.trim()
-      : "";
+function getAdminResolutionReason(row: PreviewRow) {
+  const flags = row.flags ?? {};
+  return typeof flags?.admin_resolution_reason === "string"
+    ? flags.admin_resolution_reason.trim()
+    : "";
+}
 
-  if (decision && reason) return `${decision}: ${reason}`;
-  if (decision) return decision;
-  if (reason) return reason;
-  return "";
+function getAdminResolutionAt(row: PreviewRow) {
+  const flags = row.flags ?? {};
+  return formatOptionalLocalDateTime(flags?.admin_resolution_at);
+}
+
+function getAdminOldCheckOutAt(row: PreviewRow) {
+  const flags = row.flags ?? {};
+  return formatOptionalLocalDateTime(flags?.admin_old_check_out_at);
+}
+
+function getAdminNewCheckOutAt(row: PreviewRow) {
+  const flags = row.flags ?? {};
+  return formatOptionalLocalDateTime(flags?.admin_new_check_out_at);
 }
 
 function getInspectionExportRow(r: PreviewRow) {
@@ -247,7 +265,7 @@ function getInspectionExportRow(r: PreviewRow) {
     Entrada: formatLocalDateTime(r.check_in_at),
     Salida: r.check_out_at ? formatLocalDateTime(r.check_out_at) : "",
     "Duración (min)": r.duration_minutes,
-    "Duración": formatMinutes(r.duration_minutes),
+    Duración: formatMinutes(r.duration_minutes),
     Estado: translateStatus(r.status),
     Workflow: translateWorkflow(r.workflow_status),
     "Motivo incidencia": getInspectionReason(r),
@@ -257,7 +275,11 @@ function getInspectionExportRow(r: PreviewRow) {
     "Distancia salida (m)": formatNumberForCsv(flags?.check_out_geo_distance_to_workplace_m),
     "Precisión entrada (m)": formatNumberForCsv(flags?.check_in_geo_accuracy_m),
     "Precisión salida (m)": formatNumberForCsv(flags?.check_out_geo_accuracy_m),
-    "Resolución admin": getAdminResolutionText(r),
+    "Resolución admin": getAdminResolutionDecision(r),
+    "Motivo resolución admin": getAdminResolutionReason(r),
+    "Fecha resolución admin": getAdminResolutionAt(r),
+    "Salida original": getAdminOldCheckOutAt(r),
+    "Salida corregida": getAdminNewCheckOutAt(r),
   };
 }
 
@@ -266,7 +288,6 @@ function getInspectionExportRow(r: PreviewRow) {
 // ======================================================
 
 export function AdminExportsPage() {
-  
   const { membership, loading: membershipLoading } = useActiveMembership();
 
   const today = useMemo(() => new Date(), []);
@@ -521,6 +542,10 @@ export function AdminExportsPage() {
             "Precisión entrada (m)",
             "Precisión salida (m)",
             "Resolución admin",
+            "Motivo resolución admin",
+            "Fecha resolución admin",
+            "Salida original",
+            "Salida corregida",
           ]
         );
       }

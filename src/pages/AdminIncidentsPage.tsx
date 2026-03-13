@@ -268,27 +268,20 @@ export function AdminIncidentsPage() {
   async function resolveIncident(decision: "validated" | "rejected") {
     if (!selectedIncident) return;
 
-    const automatic = isAutomaticIncident(selectedIncident);
     const reason = resolutionReason.trim();
 
-    const requiresReason = automatic ? decision === "rejected" : true;
-
-    if (requiresReason && reason.length < 3) {
-      alert(
-        automatic
-          ? "El motivo del rechazo es obligatorio (mínimo 3 caracteres)."
-          : "El motivo de resolución es obligatorio (mínimo 3 caracteres)."
-      );
+    if (reason.length < 3) {
+      alert("El motivo de resolución es obligatorio (mínimo 3 caracteres).");
       return;
     }
 
     setResolving(true);
 
-    if (automatic) {
+    if (isAutomaticIncident(selectedIncident)) {
       const nextFlags = {
         ...(selectedEntryGeo?.flags ?? {}),
         admin_resolution_decision: decision === "validated" ? "validated" : "rejected",
-        admin_resolution_reason: reason || null,
+        admin_resolution_reason: reason,
         admin_resolution_at: new Date().toISOString(),
         incident_closed_from_backoffice: true,
       };
@@ -887,10 +880,6 @@ export function AdminIncidentsPage() {
         </div>
       </section>
 
-      {/* ====================================================== */}
-      {/* PARTE 6/6 — MODAL DE RESOLUCIÓN */}
-      {/* ====================================================== */}
-
       {selectedIncident && (
         <div
           className="adminIncModalOverlay"
@@ -1164,11 +1153,7 @@ export function AdminIncidentsPage() {
                     className="adminIncModalTextarea"
                     value={resolutionReason}
                     onChange={(e) => setResolutionReason(e.target.value)}
-                    placeholder={
-                      isAutomaticIncident(selectedIncident)
-                        ? "Escribe el motivo. En incidencias automáticas es obligatorio al rechazar."
-                        : "Escribe aquí el motivo obligatorio de validación o rechazo."
-                    }
+                    placeholder="Escribe aquí el motivo obligatorio de validación o rechazo."
                   />
                 </div>
 
