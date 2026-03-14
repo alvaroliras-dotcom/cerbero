@@ -998,7 +998,7 @@ export function AdminIncidentsPage() {
 // ======================================================
 // PARTE 6/6 — UI PRINCIPAL DEL MODAL
 // ======================================================
-	  
+
       {selectedIncident && (
         <div
           className="adminIncModalOverlay"
@@ -1303,7 +1303,10 @@ export function AdminIncidentsPage() {
                 </div>
               </main>
 
-              <aside className="adminIncRightCol">
+              <aside
+                className="adminIncRightCol"
+                style={{ gap: 10, alignContent: "start" }}
+              >
                 <div className="adminIncPanel">
                   <h4 className="adminIncPanelTitle">Motivo de resolución</h4>
                   <textarea
@@ -1314,7 +1317,7 @@ export function AdminIncidentsPage() {
                   />
                 </div>
 
-                <div className="adminIncPanel" style={{ display: "grid", gap: 12, minHeight: 0 }}>
+                <div className="adminIncPanel" style={{ display: "grid", gap: 10, minHeight: 0 }}>
                   <h4 className="adminIncPanelTitle">Acciones rápidas</h4>
 
                   <div className="adminIncActionText">
@@ -1323,38 +1326,46 @@ export function AdminIncidentsPage() {
                       : "Revisa la propuesta del trabajador, la ubicación y la coherencia del fichaje antes de validar o rechazar."}
                   </div>
 
-                  <div className="adminIncModalActions">
-                    <button
-                      className="adminIncBtn"
-                      disabled={resolving}
-                      onClick={closeIncidentModal}
-                    >
-                      Cerrar
-                    </button>
+                  <div style={{ display: "grid", gap: 8, marginTop: 2 }}>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                      <button
+                        className="adminIncBtn"
+                        disabled={resolving}
+                        onClick={closeIncidentModal}
+                        style={{ width: "100%" }}
+                      >
+                        Cerrar
+                      </button>
 
-                    <button
-                      className="adminIncBtn"
-                      disabled={resolving}
-                      onClick={() => navigate(`/admin/worker/${selectedIncident.user_id}`)}
-                    >
-                      Abrir ficha
-                    </button>
+                      <button
+                        className="adminIncBtn"
+                        disabled={resolving}
+                        onClick={() => navigate(`/admin/worker/${selectedIncident.user_id}`)}
+                        style={{ width: "100%" }}
+                      >
+                        Abrir ficha
+                      </button>
+                    </div>
 
-                    <button
-                      className="adminIncBtn primary"
-                      disabled={resolving}
-                      onClick={() => resolveIncident("validated")}
-                    >
-                      {resolving ? "Procesando…" : "Validar"}
-                    </button>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                      <button
+                        className="adminIncBtn primary"
+                        disabled={resolving}
+                        onClick={() => resolveIncident("validated")}
+                        style={{ width: "100%" }}
+                      >
+                        {resolving ? "Procesando…" : "Validar"}
+                      </button>
 
-                    <button
-                      className="adminIncBtn danger"
-                      disabled={resolving}
-                      onClick={() => resolveIncident("rejected")}
-                    >
-                      {resolving ? "Procesando…" : "Rechazar"}
-                    </button>
+                      <button
+                        className="adminIncBtn danger"
+                        disabled={resolving}
+                        onClick={() => resolveIncident("rejected")}
+                        style={{ width: "100%" }}
+                      >
+                        {resolving ? "Procesando…" : "Rechazar"}
+                      </button>
+                    </div>
                   </div>
                 </div>
               </aside>
@@ -1364,4 +1375,4 @@ export function AdminIncidentsPage() {
       )}
     </div>
   );
-}	  
+}
