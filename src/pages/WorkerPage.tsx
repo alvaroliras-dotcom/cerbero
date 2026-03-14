@@ -263,38 +263,66 @@ export function WorkerPage() {
   // ======================================================
 
   const todayEntries = useMemo(() => {
-    return history
+    const base = history
       .filter((h) => isSameLocalDay(h.check_in_at, today))
       .sort(
         (a, b) =>
           new Date(a.check_in_at).getTime() - new Date(b.check_in_at).getTime()
       );
-  }, [history, today]);
+
+    if (!openEntry || !isSameLocalDay(openEntry.check_in_at, today)) {
+      return base;
+    }
+
+    const alreadyIncluded = base.some((entry) => entry.id === openEntry.id);
+    if (alreadyIncluded) {
+      return base;
+    }
+
+    return [
+      ...base,
+      {
+        id: openEntry.id,
+        check_in_at: openEntry.check_in_at,
+        check_out_at: openEntry.check_out_at ?? null,
+        workflow_status: openEntry.workflow_status ?? "auto",
+      },
+    ].sort(
+      (a, b) =>
+        new Date(a.check_in_at).getTime() - new Date(b.check_in_at).getTime()
+    );
+  }, [history, today, openEntry]);
 
   const lastTodayEntry = useMemo(() => {
     if (todayEntries.length === 0) return null;
     return todayEntries[todayEntries.length - 1];
   }, [todayEntries]);
 
-  const adjustmentTarget = openEntry ?? lastTodayEntry ?? null;
+  const adjustmentTarget = useMemo(() => {
+    if (openEntry) return openEntry;
+    if (lastTodayEntry) return lastTodayEntry;
+    return null;
+  }, [openEntry, lastTodayEntry]);
 
   const isPending = adjustmentTarget?.workflow_status === "pending";
   const requiresNewProposal =
     adjustmentTarget?.workflow_status === "requires_new_proposal";
 
+  const hasAdjustableContext = !!openEntry || todayEntries.length > 0;
+
   const isMainBlocked = false;
-  const isAdjustBlocked = !adjustmentTarget || isPending;
+  const isAdjustBlocked = !hasAdjustableContext || isPending;
 
   const topMessage = useMemo(() => {
-  if (!membership) {
-    return "No se ha detectado tu empresa. Cierra sesión y vuelve a entrar.";
-  }
+    if (!membership) {
+      return "No se ha detectado tu empresa. Cierra sesión y vuelve a entrar.";
+    }
 
-  if (requiresNewProposal) {
-    return "Tu ajuste fue rechazado. Envía una nueva propuesta.";
-  }
+    if (requiresNewProposal) {
+      return "Tu ajuste fue rechazado. Envía una nueva propuesta.";
+    }
 
-  return "";
+    return "";
   }, [membership, requiresNewProposal]);
 
   const adjustmentHelpText = useMemo(() => {
@@ -310,17 +338,21 @@ export function WorkerPage() {
   const totalTodayMinutes = useMemo(() => {
     void tick;
     let total = 0;
-    for (const e of todayEntries) {
-      total += minutesBetween(e.check_in_at, e.check_out_at);
+
+    for (const entry of todayEntries) {
+      total += minutesBetween(entry.check_in_at, entry.check_out_at);
     }
+
     return total;
   }, [todayEntries, tick]);
 
   const mainTime = useMemo(() => {
     void tick;
+
     if (isOpen && openEntry) {
       return hhmmFromMinutes(minutesBetween(openEntry.check_in_at, null));
     }
+
     return hhmmFromMinutes(totalTodayMinutes);
   }, [isOpen, openEntry, totalTodayMinutes, tick]);
 
@@ -335,6 +367,7 @@ export function WorkerPage() {
   const mainLabel = isOpen ? "SALIR" : "ENTRAR";
   const mainBg = isOpen ? exitColor : enterColor;
   const todayShown = todayEntries.slice(0, 2);
+
 
 // ======================================================
 // PARTE 4/6 — CARGA Y ACCIONES
