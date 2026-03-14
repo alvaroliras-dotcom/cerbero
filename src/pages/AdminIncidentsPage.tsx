@@ -428,9 +428,9 @@ export function AdminIncidentsPage() {
 
   const flags = selectedEntryGeo?.flags ?? null;
 
-  // ======================================================
-  // PARTE 5/6 — UI PRINCIPAL DE LA PÁGINA
-  // ======================================================
+// ======================================================
+// PARTE 5/6 — UI PRINCIPAL DE LA PÁGINA
+// ======================================================
 
   return (
     <div className="adminIncPageUi">
@@ -594,19 +594,22 @@ export function AdminIncidentsPage() {
           display: flex;
           align-items: center;
           justify-content: center;
-          padding: 20px;
+          padding: 18px;
           z-index: 9999;
         }
 
         .adminIncModalCard {
-          width: min(1280px, 100%);
+          width: min(1680px, 100%);
+          min-height: min(900px, calc(100vh - 36px));
           border: 1px solid rgba(255,255,255,.12);
-          border-radius: 22px;
+          border-radius: 24px;
           background: #111c1f;
           padding: 18px;
-          max-height: calc(100vh - 40px);
-          overflow: auto;
           box-shadow: 0 24px 60px rgba(0,0,0,.35);
+          overflow: hidden;
+          display: grid;
+          grid-template-rows: auto 1fr;
+          gap: 14px;
         }
 
         .adminIncModalHeader {
@@ -614,12 +617,11 @@ export function AdminIncidentsPage() {
           align-items: center;
           justify-content: space-between;
           gap: 12px;
-          margin-bottom: 14px;
         }
 
         .adminIncModalTitle {
           margin: 0;
-          font-size: 22px;
+          font-size: 24px;
           font-weight: 900;
           color: #eef2f7;
         }
@@ -630,46 +632,131 @@ export function AdminIncidentsPage() {
           color: rgba(255,255,255,.68);
         }
 
-        .adminIncModalTopGrid {
+        .adminIncModalShell {
           display: grid;
-          grid-template-columns: repeat(5, minmax(0, 1fr));
-          gap: 12px;
-          margin-bottom: 14px;
-        }
-
-        .adminIncModalGrid {
-          display: grid;
+          grid-template-columns: 320px minmax(0, 1fr) 320px;
           gap: 14px;
+          min-height: 0;
         }
 
-        .adminIncModalBlock {
+        .adminIncSideCol,
+        .adminIncCenterCol,
+        .adminIncRightCol {
+          min-height: 0;
+        }
+
+        .adminIncSideCol,
+        .adminIncRightCol {
           display: grid;
-          gap: 6px;
+          gap: 12px;
+          align-content: start;
+        }
+
+        .adminIncCenterCol {
+          display: grid;
+          gap: 12px;
+          min-height: 0;
+        }
+
+        .adminIncPanel {
+          border: 1px solid rgba(255,255,255,.08);
+          border-radius: 16px;
+          background: #0d1517;
+          padding: 14px;
+        }
+
+        .adminIncPanelTitle {
+          margin: 0 0 10px 0;
+          font-size: 15px;
+          font-weight: 900;
+          color: #eef2f7;
+        }
+
+        .adminIncInfoList {
+          display: grid;
+          gap: 10px;
+        }
+
+        .adminIncInfoItem {
           padding: 12px;
           border: 1px solid rgba(255,255,255,.08);
           border-radius: 14px;
-          background: #0d1517;
+          background: #10191b;
         }
 
-        .adminIncModalLabel {
-          font-size: 12px;
-          font-weight: 700;
-          color: rgba(255,255,255,.70);
+        .adminIncInfoLabel {
+          font-size: 11px;
+          font-weight: 800;
+          color: rgba(255,255,255,.62);
+          margin-bottom: 5px;
           text-transform: uppercase;
           letter-spacing: .02em;
         }
 
-        .adminIncModalValue {
-          font-size: 14px;
-          font-weight: 600;
+        .adminIncInfoValue {
+          font-size: 15px;
+          font-weight: 800;
           color: #eef2f7;
           word-break: break-word;
+        }
+
+        .adminIncEditGrid {
+          display: grid;
+          gap: 10px;
+        }
+
+        .adminIncModalInput,
+        .adminIncModalTextarea {
+          width: 100%;
+          border: 1px solid rgba(255,255,255,.12);
+          border-radius: 12px;
+          background: #10191b;
+          color: #eef2f7;
+          outline: none;
+          font-weight: 700;
+          padding: 10px 12px;
+        }
+
+        .adminIncModalTextarea {
+          min-height: 220px;
+          resize: none;
+        }
+
+        .adminIncContextBar {
+          display: grid;
+          gap: 8px;
+        }
+
+        .adminIncContextStrip {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          flex-wrap: wrap;
+          padding: 14px;
+          border-radius: 14px;
+          background: #10191b;
+          border: 1px solid rgba(255,255,255,.06);
+        }
+
+        .adminIncContextDot {
+          width: 10px;
+          height: 10px;
+          border-radius: 999px;
+          background: #4bada9;
+          flex: 0 0 auto;
+        }
+
+        .adminIncContextText {
+          font-size: 14px;
+          font-weight: 700;
+          color: #eef2f7;
         }
 
         .adminIncGeoGrid {
           display: grid;
           grid-template-columns: 1fr 1fr;
           gap: 14px;
+          min-height: 0;
         }
 
         .adminIncGeoCard {
@@ -679,6 +766,7 @@ export function AdminIncidentsPage() {
           border: 1px solid rgba(255,255,255,.08);
           border-radius: 16px;
           background: #0d1517;
+          min-height: 0;
         }
 
         .adminIncGeoCardHead {
@@ -755,28 +843,11 @@ export function AdminIncidentsPage() {
           text-decoration: underline;
         }
 
-        .adminIncBottomGrid {
-          display: grid;
-          grid-template-columns: 1.1fr .9fr;
-          gap: 14px;
-          margin-top: 14px;
-        }
-
-        .adminIncModalInput,
-        .adminIncModalTextarea {
-          width: 100%;
-          border: 1px solid rgba(255,255,255,.12);
-          border-radius: 12px;
-          background: #10191b;
-          color: #eef2f7;
-          outline: none;
+        .adminIncActionText {
+          font-size: 14px;
           font-weight: 700;
-          padding: 10px 12px;
-        }
-
-        .adminIncModalTextarea {
-          min-height: 140px;
-          resize: vertical;
+          color: rgba(255,255,255,.82);
+          line-height: 1.45;
         }
 
         .adminIncModalActions {
@@ -784,31 +855,39 @@ export function AdminIncidentsPage() {
           gap: 8px;
           justify-content: flex-end;
           flex-wrap: wrap;
-          margin-top: 16px;
+          margin-top: auto;
         }
 
-        @media (max-width: 1200px) {
-          .adminIncKpiGrid {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
+        @media (max-width: 1380px) {
+          .adminIncModalCard {
+            min-height: auto;
+            overflow: auto;
           }
 
-          .adminIncModalTopGrid {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-          }
-
-          .adminIncBottomGrid {
+          .adminIncModalShell {
             grid-template-columns: 1fr;
+          }
+
+          .adminIncGeoGrid {
+            grid-template-columns: 1fr;
+          }
+
+          .adminIncModalTextarea {
+            min-height: 160px;
           }
         }
 
         @media (max-width: 900px) {
-          .adminIncGeoGrid,
+          .adminIncKpiGrid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+
           .adminIncGeoMetaGrid {
             grid-template-columns: 1fr;
           }
 
           .adminIncMapFrame {
-            height: 280px;
+            height: 260px;
           }
         }
 
@@ -819,10 +898,6 @@ export function AdminIncidentsPage() {
 
           .adminIncInput {
             min-width: 100%;
-          }
-
-          .adminIncModalTopGrid {
-            grid-template-columns: 1fr;
           }
 
           .adminIncModalCard {
@@ -919,7 +994,7 @@ export function AdminIncidentsPage() {
           </table>
         </div>
       </section>
-
+	  
       {selectedIncident && (
         <div
           className="adminIncModalOverlay"
@@ -944,268 +1019,289 @@ export function AdminIncidentsPage() {
               </div>
             </div>
 
-            <div className="adminIncModalTopGrid">
-              <div className="adminIncModalBlock">
-                <div className="adminIncModalLabel">Tipo</div>
-                <div className="adminIncModalValue">
-                  {getIncidentTypeLabel(selectedIncident.source_type)}
-                </div>
-              </div>
+            <div className="adminIncModalShell">
+              <aside className="adminIncSideCol">
+                <div className="adminIncPanel">
+                  <h4 className="adminIncPanelTitle">Incidencia</h4>
 
-              <div className="adminIncModalBlock">
-                <div className="adminIncModalLabel">Trabajador</div>
-                <div className="adminIncModalValue">
-                  {getWorkerLabel(selectedIncident.user_id)}
-                </div>
-              </div>
-
-              <div className="adminIncModalBlock">
-                <div className="adminIncModalLabel">Entrada</div>
-                <div className="adminIncModalValue">
-                  {formatDateTime(selectedIncident.check_in_at)}
-                </div>
-              </div>
-
-              <div className="adminIncModalBlock">
-                <div className="adminIncModalLabel">
-                  {isAutomaticIncident(selectedIncident) ? "Salida registrada" : "Salida propuesta"}
-                </div>
-                <div className="adminIncModalValue">
-                  {formatDateTime(selectedIncident.proposed_check_out)}
-                </div>
-              </div>
-
-              <div className="adminIncModalBlock">
-                <div className="adminIncModalLabel">Motivo de la incidencia</div>
-                <div className="adminIncModalValue">
-                  {formatReason(selectedIncident.reason)}
-                </div>
-              </div>
-            </div>
-
-            <div
-			  style={{
-				display: "grid",
-				gridTemplateColumns: "1fr 1fr",
-				gap: 12,
-				marginBottom: 14,
-			  }}
-			>
-			  <div className="adminIncModalBlock">
-				<div className="adminIncModalLabel">Hora entrada corregida</div>
-				<input
-				  className="adminIncModalInput"
-				  type="datetime-local"
-				  value={finalCheckIn}
-				  onChange={(e) => setFinalCheckIn(e.target.value)}
-				/>
-			  </div>
-
-			  <div className="adminIncModalBlock">
-				<div className="adminIncModalLabel">Hora salida corregida</div>
-				<input
-				  className="adminIncModalInput"
-				  type="datetime-local"
-				  value={finalCheckOut}
-				  onChange={(e) => setFinalCheckOut(e.target.value)}
-				/>
-			  </div>
-			</div>
-
-            <div className="adminIncModalGrid">
-              <div className="adminIncModalBlock">
-                <div className="adminIncModalLabel">Geolocalización</div>
-
-                {loadingEntryGeo && <div className="adminIncModalValue">Cargando ubicación…</div>}
-
-                {!loadingEntryGeo && !selectedEntryGeo && (
-                  <div className="adminIncModalValue">No se ha podido cargar la ubicación.</div>
-                )}
-
-                {!loadingEntryGeo && selectedEntryGeo && (
-                  <div className="adminIncGeoGrid">
-                    <div className="adminIncGeoCard">
-                      <div className="adminIncGeoCardHead">
-                        <div className="adminIncGeoCardTitle">Entrada</div>
-                        <div className="adminIncGeoCardBadge">Check-in</div>
+                  <div className="adminIncInfoList">
+                    <div className="adminIncInfoItem">
+                      <div className="adminIncInfoLabel">Tipo</div>
+                      <div className="adminIncInfoValue">
+                        {getIncidentTypeLabel(selectedIncident.source_type)}
                       </div>
-
-                      {selectedEntryGeo.check_in_geo_lat != null &&
-                      selectedEntryGeo.check_in_geo_lng != null ? (
-                        <>
-                          <div className="adminIncGeoMetaGrid">
-                            <div className="adminIncGeoMetaItem">
-                              <div className="adminIncGeoMetaLabel">Coordenadas</div>
-                              <div className="adminIncGeoMetaValue">
-                                {formatCoords(
-                                  selectedEntryGeo.check_in_geo_lat,
-                                  selectedEntryGeo.check_in_geo_lng
-                                )}
-                              </div>
-                            </div>
-
-                            <div className="adminIncGeoMetaItem">
-                              <div className="adminIncGeoMetaLabel">Precisión</div>
-                              <div className="adminIncGeoMetaValue">
-                                {selectedEntryGeo.check_in_geo_accuracy_m != null
-                                  ? `${Math.round(selectedEntryGeo.check_in_geo_accuracy_m)} m`
-                                  : "No disponible"}
-                              </div>
-                            </div>
-
-                            <div className="adminIncGeoMetaItem">
-                              <div className="adminIncGeoMetaLabel">Distancia al centro</div>
-                              <div className="adminIncGeoMetaValue">
-                                {formatDistance(flags?.check_in_geo_distance_to_workplace_m)}
-                              </div>
-                            </div>
-
-                            <div className="adminIncGeoMetaItem">
-                              <div className="adminIncGeoMetaLabel">¿Fuera del centro?</div>
-                              <div className="adminIncGeoMetaValue">
-                                {formatBool(flags?.check_in_geo_outside_workplace)}
-                              </div>
-                            </div>
-
-                            <div className="adminIncGeoMetaItem">
-                              <div className="adminIncGeoMetaLabel">¿Evaluable?</div>
-                              <div className="adminIncGeoMetaValue">
-                                {formatBool(flags?.check_in_geo_can_evaluate_workplace)}
-                              </div>
-                            </div>
-
-                            <div className="adminIncGeoMetaItem">
-                              <div className="adminIncGeoMetaLabel">Motivo</div>
-                              <div className="adminIncGeoMetaValue">
-                                {formatReason(flags?.check_in_geo_reason)}
-                              </div>
-                            </div>
-                          </div>
-
-                          <iframe
-                            className="adminIncMapFrame"
-                            src={buildGoogleMapsEmbedUrl(
-                              selectedEntryGeo.check_in_geo_lat,
-                              selectedEntryGeo.check_in_geo_lng
-                            )}
-                            loading="lazy"
-                            referrerPolicy="no-referrer-when-downgrade"
-                            title="Mapa de entrada"
-                          />
-
-                          <a
-                            className="adminIncMapLink"
-                            href={buildGoogleMapsExternalUrl(
-                              selectedEntryGeo.check_in_geo_lat,
-                              selectedEntryGeo.check_in_geo_lng
-                            )}
-                            target="_blank"
-                            rel="noreferrer"
-                          >
-                            Ver ubicación exacta
-                          </a>
-                        </>
-                      ) : (
-                        <div className="adminIncModalValue">
-                          No hay geolocalización registrada en la entrada.
-                        </div>
-                      )}
                     </div>
 
-                    <div className="adminIncGeoCard">
-                      <div className="adminIncGeoCardHead">
-                        <div className="adminIncGeoCardTitle">Salida</div>
-                        <div className="adminIncGeoCardBadge">Check-out</div>
+                    <div className="adminIncInfoItem">
+                      <div className="adminIncInfoLabel">Trabajador</div>
+                      <div className="adminIncInfoValue">
+                        {getWorkerLabel(selectedIncident.user_id)}
                       </div>
+                    </div>
 
-                      {selectedEntryGeo.check_out_geo_lat != null &&
-                      selectedEntryGeo.check_out_geo_lng != null ? (
-                        <>
-                          <div className="adminIncGeoMetaGrid">
-                            <div className="adminIncGeoMetaItem">
-                              <div className="adminIncGeoMetaLabel">Coordenadas</div>
-                              <div className="adminIncGeoMetaValue">
-                                {formatCoords(
-                                  selectedEntryGeo.check_out_geo_lat,
-                                  selectedEntryGeo.check_out_geo_lng
-                                )}
-                              </div>
-                            </div>
+                    <div className="adminIncInfoItem">
+                      <div className="adminIncInfoLabel">Entrada actual</div>
+                      <div className="adminIncInfoValue">
+                        {formatDateTime(selectedIncident.check_in_at)}
+                      </div>
+                    </div>
 
-                            <div className="adminIncGeoMetaItem">
-                              <div className="adminIncGeoMetaLabel">Precisión</div>
-                              <div className="adminIncGeoMetaValue">
-                                {selectedEntryGeo.check_out_geo_accuracy_m != null
-                                  ? `${Math.round(selectedEntryGeo.check_out_geo_accuracy_m)} m`
-                                  : "No disponible"}
-                              </div>
-                            </div>
+                    <div className="adminIncInfoItem">
+                      <div className="adminIncInfoLabel">Salida actual</div>
+                      <div className="adminIncInfoValue">
+                        {formatDateTime(selectedIncident.proposed_check_out)}
+                      </div>
+                    </div>
 
-                            <div className="adminIncGeoMetaItem">
-                              <div className="adminIncGeoMetaLabel">Distancia al centro</div>
-                              <div className="adminIncGeoMetaValue">
-                                {formatDistance(flags?.check_out_geo_distance_to_workplace_m)}
-                              </div>
-                            </div>
-
-                            <div className="adminIncGeoMetaItem">
-                              <div className="adminIncGeoMetaLabel">¿Fuera del centro?</div>
-                              <div className="adminIncGeoMetaValue">
-                                {formatBool(flags?.check_out_geo_outside_workplace)}
-                              </div>
-                            </div>
-
-                            <div className="adminIncGeoMetaItem">
-                              <div className="adminIncGeoMetaLabel">¿Evaluable?</div>
-                              <div className="adminIncGeoMetaValue">
-                                {formatBool(flags?.check_out_geo_can_evaluate_workplace)}
-                              </div>
-                            </div>
-
-                            <div className="adminIncGeoMetaItem">
-                              <div className="adminIncGeoMetaLabel">Motivo</div>
-                              <div className="adminIncGeoMetaValue">
-                                {formatReason(flags?.check_out_geo_reason)}
-                              </div>
-                            </div>
-                          </div>
-
-                          <iframe
-                            className="adminIncMapFrame"
-                            src={buildGoogleMapsEmbedUrl(
-                              selectedEntryGeo.check_out_geo_lat,
-                              selectedEntryGeo.check_out_geo_lng
-                            )}
-                            loading="lazy"
-                            referrerPolicy="no-referrer-when-downgrade"
-                            title="Mapa de salida"
-                          />
-
-                          <a
-                            className="adminIncMapLink"
-                            href={buildGoogleMapsExternalUrl(
-                              selectedEntryGeo.check_out_geo_lat,
-                              selectedEntryGeo.check_out_geo_lng
-                            )}
-                            target="_blank"
-                            rel="noreferrer"
-                          >
-                            Ver ubicación exacta
-                          </a>
-                        </>
-                      ) : (
-                        <div className="adminIncModalValue">
-                          No hay geolocalización registrada en la salida.
-                        </div>
-                      )}
+                    <div className="adminIncInfoItem">
+                      <div className="adminIncInfoLabel">Motivo de la incidencia</div>
+                      <div className="adminIncInfoValue">
+                        {formatReason(selectedIncident.reason)}
+                      </div>
                     </div>
                   </div>
-                )}
-              </div>
+                </div>
 
-              <div className="adminIncBottomGrid">
-                <div className="adminIncModalBlock">
-                  <div className="adminIncModalLabel">Motivo de resolución</div>
+                <div className="adminIncPanel">
+                  <h4 className="adminIncPanelTitle">Corrección del tramo</h4>
+
+                  <div className="adminIncEditGrid">
+                    <div>
+                      <div className="adminIncInfoLabel" style={{ marginBottom: 6 }}>
+                        Hora entrada corregida
+                      </div>
+                      <input
+                        className="adminIncModalInput"
+                        type="datetime-local"
+                        value={finalCheckIn}
+                        onChange={(e) => setFinalCheckIn(e.target.value)}
+                      />
+                    </div>
+
+                    <div>
+                      <div className="adminIncInfoLabel" style={{ marginBottom: 6 }}>
+                        Hora salida corregida
+                      </div>
+                      <input
+                        className="adminIncModalInput"
+                        type="datetime-local"
+                        value={finalCheckOut}
+                        onChange={(e) => setFinalCheckOut(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </aside>
+
+              <main className="adminIncCenterCol">
+                <div className="adminIncPanel">
+                  <h4 className="adminIncPanelTitle">Contexto del día</h4>
+
+                  <div className="adminIncContextBar">
+                    <div className="adminIncContextStrip">
+                      <span className="adminIncContextDot" />
+                      <span className="adminIncContextText">
+                        Tramo afectado: {formatDateTime(selectedIncident.check_in_at)} →{" "}
+                        {formatDateTime(selectedIncident.proposed_check_out)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="adminIncPanel" style={{ minHeight: 0 }}>
+                  <h4 className="adminIncPanelTitle">Geolocalización</h4>
+
+                  {loadingEntryGeo && <div className="adminIncActionText">Cargando ubicación…</div>}
+
+                  {!loadingEntryGeo && !selectedEntryGeo && (
+                    <div className="adminIncActionText">No se ha podido cargar la ubicación.</div>
+                  )}
+
+                  {!loadingEntryGeo && selectedEntryGeo && (
+                    <div className="adminIncGeoGrid">
+                      <div className="adminIncGeoCard">
+                        <div className="adminIncGeoCardHead">
+                          <div className="adminIncGeoCardTitle">Entrada</div>
+                          <div className="adminIncGeoCardBadge">Check-in</div>
+                        </div>
+
+                        {selectedEntryGeo.check_in_geo_lat != null &&
+                        selectedEntryGeo.check_in_geo_lng != null ? (
+                          <>
+                            <div className="adminIncGeoMetaGrid">
+                              <div className="adminIncGeoMetaItem">
+                                <div className="adminIncGeoMetaLabel">Coordenadas</div>
+                                <div className="adminIncGeoMetaValue">
+                                  {formatCoords(
+                                    selectedEntryGeo.check_in_geo_lat,
+                                    selectedEntryGeo.check_in_geo_lng
+                                  )}
+                                </div>
+                              </div>
+
+                              <div className="adminIncGeoMetaItem">
+                                <div className="adminIncGeoMetaLabel">Precisión</div>
+                                <div className="adminIncGeoMetaValue">
+                                  {selectedEntryGeo.check_in_geo_accuracy_m != null
+                                    ? `${Math.round(selectedEntryGeo.check_in_geo_accuracy_m)} m`
+                                    : "No disponible"}
+                                </div>
+                              </div>
+
+                              <div className="adminIncGeoMetaItem">
+                                <div className="adminIncGeoMetaLabel">Distancia al centro</div>
+                                <div className="adminIncGeoMetaValue">
+                                  {formatDistance(flags?.check_in_geo_distance_to_workplace_m)}
+                                </div>
+                              </div>
+
+                              <div className="adminIncGeoMetaItem">
+                                <div className="adminIncGeoMetaLabel">¿Fuera del centro?</div>
+                                <div className="adminIncGeoMetaValue">
+                                  {formatBool(flags?.check_in_geo_outside_workplace)}
+                                </div>
+                              </div>
+
+                              <div className="adminIncGeoMetaItem">
+                                <div className="adminIncGeoMetaLabel">¿Evaluable?</div>
+                                <div className="adminIncGeoMetaValue">
+                                  {formatBool(flags?.check_in_geo_can_evaluate_workplace)}
+                                </div>
+                              </div>
+
+                              <div className="adminIncGeoMetaItem">
+                                <div className="adminIncGeoMetaLabel">Motivo</div>
+                                <div className="adminIncGeoMetaValue">
+                                  {formatReason(flags?.check_in_geo_reason)}
+                                </div>
+                              </div>
+                            </div>
+
+                            <iframe
+                              className="adminIncMapFrame"
+                              src={buildGoogleMapsEmbedUrl(
+                                selectedEntryGeo.check_in_geo_lat,
+                                selectedEntryGeo.check_in_geo_lng
+                              )}
+                              loading="lazy"
+                              referrerPolicy="no-referrer-when-downgrade"
+                              title="Mapa de entrada"
+                            />
+
+                            <a
+                              className="adminIncMapLink"
+                              href={buildGoogleMapsExternalUrl(
+                                selectedEntryGeo.check_in_geo_lat,
+                                selectedEntryGeo.check_in_geo_lng
+                              )}
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              Ver ubicación exacta
+                            </a>
+                          </>
+                        ) : (
+                          <div className="adminIncActionText">
+                            No hay geolocalización registrada en la entrada.
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="adminIncGeoCard">
+                        <div className="adminIncGeoCardHead">
+                          <div className="adminIncGeoCardTitle">Salida</div>
+                          <div className="adminIncGeoCardBadge">Check-out</div>
+                        </div>
+
+                        {selectedEntryGeo.check_out_geo_lat != null &&
+                        selectedEntryGeo.check_out_geo_lng != null ? (
+                          <>
+                            <div className="adminIncGeoMetaGrid">
+                              <div className="adminIncGeoMetaItem">
+                                <div className="adminIncGeoMetaLabel">Coordenadas</div>
+                                <div className="adminIncGeoMetaValue">
+                                  {formatCoords(
+                                    selectedEntryGeo.check_out_geo_lat,
+                                    selectedEntryGeo.check_out_geo_lng
+                                  )}
+                                </div>
+                              </div>
+
+                              <div className="adminIncGeoMetaItem">
+                                <div className="adminIncGeoMetaLabel">Precisión</div>
+                                <div className="adminIncGeoMetaValue">
+                                  {selectedEntryGeo.check_out_geo_accuracy_m != null
+                                    ? `${Math.round(selectedEntryGeo.check_out_geo_accuracy_m)} m`
+                                    : "No disponible"}
+                                </div>
+                              </div>
+
+                              <div className="adminIncGeoMetaItem">
+                                <div className="adminIncGeoMetaLabel">Distancia al centro</div>
+                                <div className="adminIncGeoMetaValue">
+                                  {formatDistance(flags?.check_out_geo_distance_to_workplace_m)}
+                                </div>
+                              </div>
+
+                              <div className="adminIncGeoMetaItem">
+                                <div className="adminIncGeoMetaLabel">¿Fuera del centro?</div>
+                                <div className="adminIncGeoMetaValue">
+                                  {formatBool(flags?.check_out_geo_outside_workplace)}
+                                </div>
+                              </div>
+
+                              <div className="adminIncGeoMetaItem">
+                                <div className="adminIncGeoMetaLabel">¿Evaluable?</div>
+                                <div className="adminIncGeoMetaValue">
+                                  {formatBool(flags?.check_out_geo_can_evaluate_workplace)}
+                                </div>
+                              </div>
+
+                              <div className="adminIncGeoMetaItem">
+                                <div className="adminIncGeoMetaLabel">Motivo</div>
+                                <div className="adminIncGeoMetaValue">
+                                  {formatReason(flags?.check_out_geo_reason)}
+                                </div>
+                              </div>
+                            </div>
+
+                            <iframe
+                              className="adminIncMapFrame"
+                              src={buildGoogleMapsEmbedUrl(
+                                selectedEntryGeo.check_out_geo_lat,
+                                selectedEntryGeo.check_out_geo_lng
+                              )}
+                              loading="lazy"
+                              referrerPolicy="no-referrer-when-downgrade"
+                              title="Mapa de salida"
+                            />
+
+                            <a
+                              className="adminIncMapLink"
+                              href={buildGoogleMapsExternalUrl(
+                                selectedEntryGeo.check_out_geo_lat,
+                                selectedEntryGeo.check_out_geo_lng
+                              )}
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              Ver ubicación exacta
+                            </a>
+                          </>
+                        ) : (
+                          <div className="adminIncActionText">
+                            No hay geolocalización registrada en la salida.
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </main>
+
+              <aside className="adminIncRightCol">
+                <div className="adminIncPanel">
+                  <h4 className="adminIncPanelTitle">Motivo de resolución</h4>
                   <textarea
                     className="adminIncModalTextarea"
                     value={resolutionReason}
@@ -1214,11 +1310,12 @@ export function AdminIncidentsPage() {
                   />
                 </div>
 
-                <div className="adminIncModalBlock">
-                  <div className="adminIncModalLabel">Acciones rápidas</div>
-                  <div className="adminIncModalValue">
+                <div className="adminIncPanel" style={{ display: "grid", gap: 12, minHeight: 0 }}>
+                  <h4 className="adminIncPanelTitle">Acciones rápidas</h4>
+
+                  <div className="adminIncActionText">
                     {isAutomaticIncident(selectedIncident)
-                      ? "Revisa mapa, horas, flags y geolocalización antes de validar o rechazar la incidencia automática."
+                      ? "Revisa mapas, horas, flags y geolocalización antes de validar o rechazar la incidencia automática."
                       : "Revisa la propuesta del trabajador, la ubicación y la coherencia del fichaje antes de validar o rechazar."}
                   </div>
 
@@ -1256,11 +1353,11 @@ export function AdminIncidentsPage() {
                     </button>
                   </div>
                 </div>
-              </div>
+              </aside>
             </div>
           </div>
         </div>
       )}
     </div>
   );
-}
+}	  
