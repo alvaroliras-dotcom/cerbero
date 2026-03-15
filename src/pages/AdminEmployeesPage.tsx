@@ -1,3 +1,4 @@
+import "../ui/admin-components.css";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabaseClient";
