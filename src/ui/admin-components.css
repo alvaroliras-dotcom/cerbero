@@ -92,18 +92,18 @@
   padding: 0 14px;
   display: inline-flex;
   align-items: center;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  background: var(--panel-bg);
-  color: var(--text-soft);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  background: #10191b;
+  color: rgba(255, 255, 255, 0.8);
   font-size: 13px;
   font-weight: 700;
 }
 
 .admin-card {
-  border: 1px solid var(--border-on-dark);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 18px;
-  background: var(--panel-dark);
+  background: #111c1f;
   padding: var(--card-padding);
 }
 
@@ -111,14 +111,14 @@
   margin: 0;
   font-size: 18px;
   font-weight: 800;
-  color: var(--text-on-dark);
+  color: #eef2f7;
 }
 
 .admin-card-sub {
   margin: 4px 0 0 0;
   font-size: 13px;
   font-weight: 600;
-  color: var(--text-on-dark-soft);
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .admin-notice {
@@ -136,25 +136,25 @@
   min-width: 0;
   height: var(--control-height);
   padding: 0 12px;
-  border: 1px solid var(--border-on-dark);
-  border-radius: var(--radius-md);
-  background: var(--panel-dark-2);
-  color: var(--text-on-dark);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  background: #10191b;
+  color: #eef2f7;
   outline: none;
   font-weight: 700;
   box-sizing: border-box;
 }
 
 .admin-input::placeholder {
-  color: var(--text-on-dark-muted);
+  color: rgba(255, 255, 255, 0.55);
 }
 
 .admin-table-wrap {
   margin-top: 12px;
   overflow: auto;
-  border: 1px solid var(--border-on-dark);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 14px;
-  background: var(--panel-dark-2);
+  background: #0d1517;
 }
 
 .admin-table {
@@ -166,14 +166,14 @@
 .admin-table td {
   padding: 12px;
   text-align: left;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   font-size: 14px;
-  color: var(--text-on-dark);
+  color: #eef2f7;
   vertical-align: middle;
 }
 
 .admin-table th {
-  color: var(--text-on-dark-soft);
+  color: rgba(255, 255, 255, 0.75);
   font-weight: 800;
 }
 
@@ -209,7 +209,7 @@
 .admin-empty {
   padding: 24px 12px;
   text-align: center;
-  color: var(--text-on-dark-soft);
+  color: rgba(255, 255, 255, 0.7);
   font-weight: 600;
 }
 
