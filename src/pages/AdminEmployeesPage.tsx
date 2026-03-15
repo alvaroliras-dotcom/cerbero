@@ -3,19 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabaseClient";
 import { useActiveMembership } from "../app/useActiveMembership";
 
-// ======================================================
-// PARTE 1/6 — TIPOS
-// ======================================================
-
 type Profile = {
   id: string;
   email: string | null;
   full_name: string | null;
 };
-
-// ======================================================
-// PARTE 2/6 — COMPONENTE Y ESTADO
-// ======================================================
 
 export function AdminEmployeesPage() {
   const navigate = useNavigate();
@@ -24,10 +16,6 @@ export function AdminEmployeesPage() {
   const [employees, setEmployees] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-
-  // ======================================================
-  // PARTE 3/6 — CARGA DE DATOS
-  // ======================================================
 
   async function loadEmployees() {
     if (!membership) return;
@@ -53,14 +41,9 @@ export function AdminEmployeesPage() {
     setLoading(false);
   }
 
-  // ======================================================
-  // PARTE 4/6 — DERIVADOS Y EFECTOS
-  // ======================================================
-
   useEffect(() => {
     if (!membership) return;
     loadEmployees();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [membership?.company_id]);
 
   const filteredEmployees = useMemo(() => {
@@ -76,16 +59,8 @@ export function AdminEmployeesPage() {
     });
   }, [employees, search]);
 
-  // ======================================================
-  // PARTE 5/6 — ESTADOS BASE
-  // ======================================================
-
   if (membershipLoading) return <div style={{ padding: 24 }}>Cargando…</div>;
   if (!membership) return <div style={{ padding: 24 }}>Sin empresa activa.</div>;
-
-  // ======================================================
-  // PARTE 6/6 — UI DE LA PÁGINA
-  // ======================================================
 
   return (
     <div className="admin-page">
@@ -105,7 +80,13 @@ export function AdminEmployeesPage() {
         </div>
       </section>
 
-      <section className="admin-card">
+      <section
+        className="admin-card"
+        style={{
+          width: "100%",
+          maxWidth: 1100,
+        }}
+      >
         <h2 className="admin-card-title">Directorio de empleados</h2>
         <p className="admin-card-sub">Abrir ficha individual de cada trabajador</p>
 
@@ -117,7 +98,7 @@ export function AdminEmployeesPage() {
 
         {!loading && employees.length > 0 && (
           <div className="admin-table-wrap">
-            <table className="admin-table" style={{ minWidth: 680 }}>
+            <table className="admin-table">
               <thead>
                 <tr>
                   <th>Empleado</th>
