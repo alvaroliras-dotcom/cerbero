@@ -101,9 +101,9 @@
 }
 
 .admin-card {
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 4px solid red !important;
   border-radius: 18px;
-  background: #111c1f;
+  background: yellow !important;
   padding: var(--card-padding);
 }
 
@@ -136,10 +136,10 @@
   min-width: 0;
   height: var(--control-height);
   padding: 0 12px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 3px solid blue !important;
   border-radius: 12px;
-  background: #10191b;
-  color: #eef2f7;
+  background: lime !important;
+  color: black !important;
   outline: none;
   font-weight: 700;
   box-sizing: border-box;
