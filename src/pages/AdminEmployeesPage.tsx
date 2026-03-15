@@ -132,8 +132,6 @@ export function AdminEmployeesPage() {
           border-radius: 18px;
           background: #111c1f;
           padding: 16px;
-          width: 100%;
-          max-width: 1020px;
         }
 
         .adminEmpCardTitle {
