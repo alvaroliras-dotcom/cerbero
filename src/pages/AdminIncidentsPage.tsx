@@ -1000,10 +1000,6 @@ export function AdminIncidentsPage() {
         </div>
       </section>
 
-   // ======================================================
-  // PARTE 6/6 — UI PRINCIPAL DEL MODAL
-  // ======================================================
- 
 
       {selectedIncident && (
         <div
