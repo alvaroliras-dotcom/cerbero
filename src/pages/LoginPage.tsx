@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { adminTheme } from "../ui/adminTheme";
 
 import CerberoLogo from "../assets/LOGOTIPO-CERBERO.svg";
 import SolventoLogo from "../assets/LOGOTIPO-SOLVENTO-COLOR.svg";
@@ -18,8 +19,6 @@ export function LoginPage() {
   const [pin, setPin] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-
-  const brand = "#4bada9";
 
   useEffect(() => {
     setEmail(emailFromLink);
@@ -77,7 +76,7 @@ export function LoginPage() {
         width: "100vw",
         height: "100vh",
         overflow: "auto",
-        background: `linear-gradient(180deg, ${brand} 0%, #cfeeed 60%, #ffffff 100%)`,
+        background: `linear-gradient(180deg, ${adminTheme.colors.primary} 0%, ${adminTheme.colors.primarySoft} 60%, ${adminTheme.colors.pageBg} 100%)`,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -88,17 +87,16 @@ export function LoginPage() {
         style={{
           width: "100%",
           maxWidth: 420,
-          background: "#ffffff",
+          background: adminTheme.colors.panelBg,
           borderRadius: 18,
-          boxShadow: "0 20px 50px rgba(0,0,0,0.15)",
+          boxShadow: adminTheme.shadow.lg,
           padding: 24,
-          border: `1px solid ${brand}33`,
+          border: `1px solid ${adminTheme.colors.border}`,
           display: "flex",
           flexDirection: "column",
           gap: 16,
         }}
       >
-        {/* SOLVENTO */}
         <div style={{ textAlign: "center" }}>
           <img
             src={SolventoLogo}
@@ -112,10 +110,17 @@ export function LoginPage() {
           />
         </div>
 
-        <div style={{ textAlign: "center", fontSize: 14, color: "#444" }}>
+        <div
+          style={{
+            textAlign: "center",
+            fontSize: 14,
+            color: adminTheme.colors.textSoft,
+            fontWeight: 600,
+          }}
+        >
           {email ? (
             <>
-              Acceso para <strong>{email}</strong>
+              Acceso para <strong style={{ color: adminTheme.colors.text }}>{email}</strong>
             </>
           ) : (
             "Acceso de trabajador"
@@ -135,9 +140,13 @@ export function LoginPage() {
               padding: 16,
               fontSize: 18,
               borderRadius: 12,
-              border: "1px solid #ddd",
+              border: `1px solid ${adminTheme.colors.border}`,
               outline: "none",
               textAlign: "center",
+              background: adminTheme.colors.panelSoft,
+              color: adminTheme.colors.text,
+              fontWeight: 700,
+              boxSizing: "border-box",
             }}
           />
 
@@ -148,10 +157,11 @@ export function LoginPage() {
               fontSize: 16,
               fontWeight: 800,
               borderRadius: 12,
-              border: "none",
-              background: brand,
-              color: "white",
-              cursor: "pointer",
+              border: `1px solid ${adminTheme.colors.primary}`,
+              background: adminTheme.colors.primary,
+              color: adminTheme.colors.textOnPrimary,
+              cursor: loading ? "not-allowed" : "pointer",
+              opacity: loading ? 0.7 : 1,
             }}
           >
             {loading ? "Entrando..." : "Entrar"}
@@ -160,12 +170,14 @@ export function LoginPage() {
           {error && (
             <div
               style={{
-                color: "crimson",
+                color: adminTheme.colors.danger,
                 fontSize: 13,
                 textAlign: "center",
-                background: "#ffeef0",
+                background: adminTheme.colors.dangerSoft,
                 padding: 10,
                 borderRadius: 10,
+                border: `1px solid ${adminTheme.colors.danger}`,
+                fontWeight: 700,
               }}
             >
               {error}
@@ -173,16 +185,21 @@ export function LoginPage() {
           )}
         </form>
 
-        <div style={{ textAlign: "center", fontSize: 12, color: "#666" }}>
+        <div
+          style={{
+            textAlign: "center",
+            fontSize: 12,
+            color: adminTheme.colors.textMuted,
+          }}
+        >
           Si no tienes el enlace, pide a tu responsable que te lo reenvíe.
         </div>
 
-        {/* CERBERO */}
         <div
           style={{
             marginTop: 10,
             paddingTop: 16,
-            borderTop: "1px solid #eee",
+            borderTop: `1px solid ${adminTheme.colors.border}`,
             display: "flex",
             justifyContent: "center",
           }}

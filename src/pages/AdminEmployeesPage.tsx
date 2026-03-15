@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabaseClient";
 import { useActiveMembership } from "../app/useActiveMembership";
+import { adminTheme } from "../ui/adminTheme";
 
 // ======================================================
 // PARTE 1/6 — TIPOS
@@ -80,8 +81,33 @@ export function AdminEmployeesPage() {
 // PARTE 5/6 — ESTADOS BASE
 // ======================================================
 
-  if (membershipLoading) return <div style={{ padding: 24 }}>Cargando…</div>;
-  if (!membership) return <div style={{ padding: 24 }}>Sin empresa activa.</div>;
+  if (membershipLoading) {
+    return (
+      <div
+        style={{
+          padding: 24,
+          color: adminTheme.colors.text,
+          background: adminTheme.colors.appBg,
+        }}
+      >
+        Cargando…
+      </div>
+    );
+  }
+
+  if (!membership) {
+    return (
+      <div
+        style={{
+          padding: 24,
+          color: adminTheme.colors.text,
+          background: adminTheme.colors.appBg,
+        }}
+      >
+        Sin empresa activa.
+      </div>
+    );
+  }
 
 // ======================================================
 // PARTE 6/6 — UI DE LA PÁGINA
@@ -105,13 +131,17 @@ export function AdminEmployeesPage() {
         .adminEmpInput {
           height: 40px;
           padding: 0 12px;
-          border: 1px solid rgba(255,255,255,.12);
-          border-radius: 12px;
-          background: #10191b;
-          color: #eef2f7;
+          border: 1px solid ${adminTheme.colors.border};
+          border-radius: ${adminTheme.radius.md};
+          background: ${adminTheme.colors.panelBg};
+          color: ${adminTheme.colors.text};
           outline: none;
           font-weight: 700;
           min-width: 260px;
+        }
+
+        .adminEmpInput::placeholder {
+          color: ${adminTheme.colors.textMuted};
         }
 
         .adminEmpBadge {
@@ -119,41 +149,42 @@ export function AdminEmployeesPage() {
           padding: 0 14px;
           display: inline-flex;
           align-items: center;
-          border: 1px solid rgba(255,255,255,.12);
-          border-radius: 12px;
-          background: #10191b;
-          color: rgba(255,255,255,.80);
+          border: 1px solid ${adminTheme.colors.border};
+          border-radius: ${adminTheme.radius.md};
+          background: ${adminTheme.colors.panelBg};
+          color: ${adminTheme.colors.textSoft};
           font-size: 13px;
           font-weight: 700;
         }
 
         .adminEmpCard {
-          border: 1px solid rgba(255,255,255,.10);
+          border: 1px solid ${adminTheme.colors.border};
           border-radius: 18px;
-          background: #111c1f;
+          background: ${adminTheme.colors.panelBg};
           padding: 16px;
+          box-shadow: ${adminTheme.shadow.sm};
         }
 
         .adminEmpCardTitle {
           margin: 0;
           font-size: 18px;
           font-weight: 800;
-          color: #eef2f7;
+          color: ${adminTheme.colors.text};
         }
 
         .adminEmpCardSub {
           margin: 4px 0 0 0;
           font-size: 13px;
           font-weight: 600;
-          color: rgba(255,255,255,.70);
+          color: ${adminTheme.colors.textSoft};
         }
 
         .adminEmpTableWrap {
           margin-top: 12px;
           overflow: auto;
-          border: 1px solid rgba(255,255,255,.10);
+          border: 1px solid ${adminTheme.colors.border};
           border-radius: 14px;
-          background: #0d1517;
+          background: ${adminTheme.colors.panelSoft};
         }
 
         .adminEmpTable {
@@ -166,15 +197,16 @@ export function AdminEmployeesPage() {
         .adminEmpTable td {
           padding: 12px;
           text-align: left;
-          border-bottom: 1px solid rgba(255,255,255,.08);
+          border-bottom: 1px solid ${adminTheme.colors.border};
           font-size: 14px;
-          color: #eef2f7;
+          color: ${adminTheme.colors.text};
           vertical-align: middle;
         }
 
         .adminEmpTable th {
-          color: rgba(255,255,255,.75);
+          color: ${adminTheme.colors.textSoft};
           font-weight: 800;
+          background: ${adminTheme.colors.panelAlt};
         }
 
         .adminEmpRight {
@@ -184,17 +216,18 @@ export function AdminEmployeesPage() {
         .adminEmpBtn {
           height: 40px;
           padding: 0 16px;
-          border: 1px solid rgba(255,255,255,.12);
-          border-radius: 12px;
-          background: #4bada9;
-          color: #071012;
+          border: 1px solid ${adminTheme.colors.primary};
+          border-radius: ${adminTheme.radius.md};
+          background: ${adminTheme.colors.primary};
+          color: ${adminTheme.colors.textOnPrimary};
           font-weight: 700;
           cursor: pointer;
+          transition: background .18s ease, border-color .18s ease, color .18s ease;
         }
 
         .adminEmpEmpty {
           margin-top: 12px;
-          color: rgba(255,255,255,.70);
+          color: ${adminTheme.colors.textSoft};
           font-weight: 600;
         }
 

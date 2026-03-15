@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import { useActiveMembership } from "../app/useActiveMembership";
+import { adminTheme } from "../ui/adminTheme";
 
 type HolidayRow = {
   id: string;
@@ -347,40 +348,61 @@ export function AdminSettingsPage() {
   }, [membership?.company_id]);
 
   if (membershipLoading || loading) {
-    return <div style={{ padding: 24, color: "#eef2f7" }}>Cargando configuración...</div>;
+    return (
+      <div
+        style={{
+          padding: 24,
+          color: adminTheme.colors.text,
+          background: adminTheme.colors.pageBg,
+        }}
+      >
+        Cargando configuración...
+      </div>
+    );
   }
 
   if (!membership) {
-    return <div style={{ padding: 24, color: "#eef2f7" }}>Sin empresa activa.</div>;
+    return (
+      <div
+        style={{
+          padding: 24,
+          color: adminTheme.colors.text,
+          background: adminTheme.colors.pageBg,
+        }}
+      >
+        Sin empresa activa.
+      </div>
+    );
   }
 
   return (
     <div className="adminSettingsUi">
-      <style>{`
+            <style>{`
         .adminSettingsUi {
           display: grid;
           gap: 12px;
         }
 
         .adminSettingsHero {
-          border: 1px solid rgba(255,255,255,.10);
+          border: 1px solid ${adminTheme.colors.border};
           border-radius: 18px;
-          background: #111c1f;
+          background: ${adminTheme.colors.panelBg};
           padding: 18px;
+          box-shadow: ${adminTheme.shadow.sm};
         }
 
         .adminSettingsTitle {
           margin: 0;
           font-size: 22px;
           font-weight: 800;
-          color: #eef2f7;
+          color: ${adminTheme.colors.text};
         }
 
         .adminSettingsSub {
           margin: 6px 0 0 0;
           font-size: 14px;
           line-height: 1.45;
-          color: rgba(255,255,255,.72);
+          color: ${adminTheme.colors.textSoft};
           font-weight: 600;
         }
 
@@ -392,24 +414,25 @@ export function AdminSettingsPage() {
         }
 
         .adminSettingsCard {
-          border: 1px solid rgba(255,255,255,.10);
+          border: 1px solid ${adminTheme.colors.border};
           border-radius: 18px;
-          background: #111c1f;
+          background: ${adminTheme.colors.panelBg};
           padding: 16px;
+          box-shadow: ${adminTheme.shadow.sm};
         }
 
         .adminSettingsCardTitle {
           margin: 0;
           font-size: 18px;
           font-weight: 800;
-          color: #eef2f7;
+          color: ${adminTheme.colors.text};
         }
 
         .adminSettingsCardSub {
           margin: 4px 0 0 0;
           font-size: 13px;
           line-height: 1.45;
-          color: rgba(255,255,255,.72);
+          color: ${adminTheme.colors.textSoft};
           font-weight: 600;
         }
 
@@ -433,9 +456,9 @@ export function AdminSettingsPage() {
           gap: 12px;
           min-height: 52px;
           padding: 12px 14px;
-          border: 1px solid rgba(255,255,255,.08);
+          border: 1px solid ${adminTheme.colors.border};
           border-radius: 14px;
-          background: #0d1517;
+          background: ${adminTheme.colors.panelSoft};
         }
 
         .adminSettingsSwitchText {
@@ -444,13 +467,13 @@ export function AdminSettingsPage() {
         }
 
         .adminSettingsSwitchText strong {
-          color: #eef2f7;
+          color: ${adminTheme.colors.text};
           font-size: 14px;
           font-weight: 800;
         }
 
         .adminSettingsSwitchText span {
-          color: rgba(255,255,255,.68);
+          color: ${adminTheme.colors.textSoft};
           font-size: 13px;
           font-weight: 600;
           line-height: 1.4;
@@ -462,14 +485,14 @@ export function AdminSettingsPage() {
           height: 30px;
           border: none;
           border-radius: 999px;
-          background: #243437;
+          background: ${adminTheme.colors.panelAlt};
           cursor: pointer;
           transition: background .2s ease;
           flex: 0 0 auto;
         }
 
         .adminSettingsToggle.active {
-          background: #4bada9;
+          background: ${adminTheme.colors.primary};
         }
 
         .adminSettingsToggleDot {
@@ -479,7 +502,7 @@ export function AdminSettingsPage() {
           width: 24px;
           height: 24px;
           border-radius: 999px;
-          background: #fff;
+          background: ${adminTheme.colors.textOnPrimary};
           transition: transform .2s ease;
         }
 
@@ -496,7 +519,7 @@ export function AdminSettingsPage() {
 
         .adminSettingsField label {
           font-size: 12px;
-          color: rgba(255,255,255,.70);
+          color: ${adminTheme.colors.textSoft};
           font-weight: 700;
         }
 
@@ -504,10 +527,10 @@ export function AdminSettingsPage() {
         .adminSettingsSelect,
         .adminSettingsTextarea {
           width: 100%;
-          border: 1px solid rgba(255,255,255,.12);
+          border: 1px solid ${adminTheme.colors.border};
           border-radius: 12px;
-          background: #10191b;
-          color: #eef2f7;
+          background: ${adminTheme.colors.panelBg};
+          color: ${adminTheme.colors.text};
           outline: none;
           font-weight: 700;
           box-sizing: border-box;
@@ -528,42 +551,42 @@ export function AdminSettingsPage() {
 
         .adminSettingsInput[type="date"],
         .adminSettingsInput[type="time"] {
-          color-scheme: dark;
+          color-scheme: light;
         }
 
         .adminSettingsInput[type="date"]::-webkit-calendar-picker-indicator,
         .adminSettingsInput[type="time"]::-webkit-calendar-picker-indicator {
           opacity: 1;
           cursor: pointer;
-          filter: invert(1) brightness(1.35);
         }
 
         .adminSettingsSelect option {
-          background: #10191b;
-          color: #eef2f7;
+          background: ${adminTheme.colors.panelBg};
+          color: ${adminTheme.colors.text};
         }
 
         .adminSettingsBtn {
           height: 42px;
           padding: 0 16px;
-          border: 1px solid rgba(255,255,255,.12);
+          border: 1px solid ${adminTheme.colors.border};
           border-radius: 12px;
-          background: #162427;
-          color: #eef2f7;
+          background: ${adminTheme.colors.panelSoft};
+          color: ${adminTheme.colors.text};
           font-weight: 800;
           cursor: pointer;
+          transition: background .18s ease, border-color .18s ease, color .18s ease, opacity .18s ease;
         }
 
         .adminSettingsBtn.primary {
-          background: #4bada9;
-          color: #071012;
-          border-color: #4bada9;
+          background: ${adminTheme.colors.primary};
+          color: ${adminTheme.colors.textOnPrimary};
+          border-color: ${adminTheme.colors.primary};
         }
 
         .adminSettingsBtn.danger {
-          background: #2a1114;
-          color: #ffd7d7;
-          border-color: #5f1e25;
+          background: ${adminTheme.colors.dangerSoft};
+          color: ${adminTheme.colors.danger};
+          border-color: ${adminTheme.colors.danger};
         }
 
         .adminSettingsBtn:disabled {
@@ -573,7 +596,7 @@ export function AdminSettingsPage() {
 
         .adminSettingsNote {
           margin-top: 2px;
-          color: rgba(255,255,255,.68);
+          color: ${adminTheme.colors.textSoft};
           font-size: 13px;
           line-height: 1.45;
           font-weight: 600;
@@ -591,9 +614,9 @@ export function AdminSettingsPage() {
           justify-content: space-between;
           gap: 12px;
           padding: 12px 14px;
-          border: 1px solid rgba(255,255,255,.08);
+          border: 1px solid ${adminTheme.colors.border};
           border-radius: 14px;
-          background: #0d1517;
+          background: ${adminTheme.colors.panelSoft};
         }
 
         .adminSettingsItemMain {
@@ -603,23 +626,23 @@ export function AdminSettingsPage() {
         }
 
         .adminSettingsItemMain strong {
-          color: #eef2f7;
+          color: ${adminTheme.colors.text};
           font-size: 14px;
           font-weight: 800;
         }
 
         .adminSettingsItemMain span {
-          color: rgba(255,255,255,.68);
+          color: ${adminTheme.colors.textSoft};
           font-size: 13px;
           font-weight: 600;
         }
 
         .adminSettingsEmpty {
           padding: 16px;
-          border: 1px dashed rgba(255,255,255,.12);
+          border: 1px dashed ${adminTheme.colors.border};
           border-radius: 14px;
-          background: #0d1517;
-          color: rgba(255,255,255,.72);
+          background: ${adminTheme.colors.panelSoft};
+          color: ${adminTheme.colors.textSoft};
           font-size: 13px;
           font-weight: 600;
           text-align: center;
@@ -633,21 +656,21 @@ export function AdminSettingsPage() {
 
         .adminSettingsSummaryItem {
           padding: 12px 14px;
-          border: 1px solid rgba(255,255,255,.08);
+          border: 1px solid ${adminTheme.colors.border};
           border-radius: 14px;
-          background: #0d1517;
+          background: ${adminTheme.colors.panelSoft};
         }
 
         .adminSettingsSummaryItem strong {
           display: block;
           margin-bottom: 4px;
-          color: #eef2f7;
+          color: ${adminTheme.colors.text};
           font-size: 14px;
           font-weight: 800;
         }
 
         .adminSettingsSummaryItem span {
-          color: rgba(255,255,255,.68);
+          color: ${adminTheme.colors.textSoft};
           font-size: 13px;
           line-height: 1.45;
           font-weight: 600;
@@ -661,15 +684,15 @@ export function AdminSettingsPage() {
         }
 
         .adminSettingsNotice.error {
-          background: #3b1014;
-          color: #ffd7d7;
-          border: 1px solid #7f1d1d;
+          background: ${adminTheme.colors.dangerSoft};
+          color: ${adminTheme.colors.danger};
+          border: 1px solid ${adminTheme.colors.danger};
         }
 
         .adminSettingsNotice.success {
-          background: #0f2c24;
-          color: #d7fff1;
-          border: 1px solid #1f6f57;
+          background: ${adminTheme.colors.successSoft};
+          color: ${adminTheme.colors.success};
+          border: 1px solid ${adminTheme.colors.success};
         }
 
         @media (max-width: 1100px) {

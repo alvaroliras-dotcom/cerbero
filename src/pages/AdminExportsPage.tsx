@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import { useActiveMembership } from "../app/useActiveMembership";
+import { adminTheme } from "../ui/adminTheme";
 
 // ======================================================
 // PARTE 1/6 — TIPOS Y HELPERS
@@ -613,10 +614,14 @@ export function AdminExportsPage() {
   // PARTE 6/6 — UI DE LA PÁGINA
   // ======================================================
 
+   // ======================================================
+  // PARTE 6/6 — UI DE LA PÁGINA
+  // ======================================================
+
   return (
     <div className="adminExpPageUi">
       <style>{`
-              .adminExpPageUi {
+      .adminExpPageUi {
         display: grid;
         gap: 12px;
       }
@@ -631,17 +636,19 @@ export function AdminExportsPage() {
       .adminExpPill {
         height: 40px;
         padding: 0 14px;
-        border: 1px solid rgba(255,255,255,.12);
-        border-radius: 12px;
-        background: #162427;
-        color: #eef2f7;
+        border: 1px solid ${adminTheme.colors.border};
+        border-radius: ${adminTheme.radius.md};
+        background: ${adminTheme.colors.panelSoft};
+        color: ${adminTheme.colors.text};
         font-weight: 700;
         cursor: pointer;
+        transition: background .18s ease, border-color .18s ease, color .18s ease;
       }
 
       .adminExpPill.active {
-        background: #1f4f52;
-        border-color: #4bada9;
+        background: ${adminTheme.colors.primarySoft};
+        border-color: ${adminTheme.colors.primary};
+        color: ${adminTheme.colors.primary};
       }
 
       .adminExpField {
@@ -650,14 +657,14 @@ export function AdminExportsPage() {
         gap: 8px;
         height: 40px;
         padding: 0 12px;
-        border: 1px solid rgba(255,255,255,.12);
-        border-radius: 12px;
-        background: #10191b;
+        border: 1px solid ${adminTheme.colors.border};
+        border-radius: ${adminTheme.radius.md};
+        background: ${adminTheme.colors.panelBg};
       }
 
       .adminExpField label {
         font-size: 12px;
-        color: rgba(255,255,255,.70);
+        color: ${adminTheme.colors.textSoft};
         font-weight: 700;
         white-space: nowrap;
       }
@@ -666,36 +673,36 @@ export function AdminExportsPage() {
         background: transparent;
         border: none;
         outline: none;
-        color: #eef2f7;
+        color: ${adminTheme.colors.text};
         font-weight: 700;
       }
 
       .adminExpField input[type="date"] {
-        color-scheme: dark;
         min-width: 140px;
+        color-scheme: light;
       }
 
       .adminExpField input[type="date"]::-webkit-calendar-picker-indicator {
         opacity: 1;
         cursor: pointer;
-        filter: invert(1) brightness(1.35);
       }
 
       .adminExpBtn {
         height: 40px;
         padding: 0 16px;
-        border: 1px solid rgba(255,255,255,.12);
-        border-radius: 12px;
-        background: #162427;
-        color: #eef2f7;
+        border: 1px solid ${adminTheme.colors.border};
+        border-radius: ${adminTheme.radius.md};
+        background: ${adminTheme.colors.panelSoft};
+        color: ${adminTheme.colors.text};
         font-weight: 700;
         cursor: pointer;
+        transition: background .18s ease, border-color .18s ease, color .18s ease, opacity .18s ease;
       }
 
       .adminExpBtn.primary {
-        background: #4bada9;
-        color: #071012;
-        border-color: #4bada9;
+        background: ${adminTheme.colors.primary};
+        color: ${adminTheme.colors.textOnPrimary};
+        border-color: ${adminTheme.colors.primary};
       }
 
       .adminExpBtn:disabled {
@@ -704,14 +711,14 @@ export function AdminExportsPage() {
       }
 
       .adminExpBadge {
-        height: 40px;
+        min-height: 40px;
         padding: 0 14px;
         display: inline-flex;
         align-items: center;
-        border: 1px solid rgba(255,255,255,.12);
-        border-radius: 12px;
-        background: #10191b;
-        color: rgba(255,255,255,.80);
+        border: 1px solid ${adminTheme.colors.border};
+        border-radius: ${adminTheme.radius.md};
+        background: ${adminTheme.colors.panelBg};
+        color: ${adminTheme.colors.textSoft};
         font-size: 13px;
         font-weight: 700;
       }
@@ -723,23 +730,24 @@ export function AdminExportsPage() {
       }
 
       .adminExpKpi {
-        border: 1px solid rgba(255,255,255,.10);
+        border: 1px solid ${adminTheme.colors.border};
         border-radius: 18px;
-        background: #111c1f;
+        background: ${adminTheme.colors.panelBg};
         padding: 16px;
+        box-shadow: ${adminTheme.shadow.sm};
       }
 
       .adminExpKpiLabel {
         font-size: 13px;
         font-weight: 700;
-        color: rgba(255,255,255,.70);
+        color: ${adminTheme.colors.textSoft};
       }
 
       .adminExpKpiValue {
         margin-top: 8px;
         font-size: 26px;
         font-weight: 800;
-        color: #eef2f7;
+        color: ${adminTheme.colors.text};
       }
 
       .adminExpMainGrid {
@@ -755,33 +763,34 @@ export function AdminExportsPage() {
       }
 
       .adminExpCard {
-        border: 1px solid rgba(255,255,255,.10);
+        border: 1px solid ${adminTheme.colors.border};
         border-radius: 18px;
-        background: #111c1f;
+        background: ${adminTheme.colors.panelBg};
         padding: 16px;
+        box-shadow: ${adminTheme.shadow.sm};
       }
 
       .adminExpCardTitle {
         margin: 0;
         font-size: 18px;
         font-weight: 800;
-        color: #eef2f7;
+        color: ${adminTheme.colors.text};
       }
 
       .adminExpCardSub {
         margin: 4px 0 0 0;
         font-size: 13px;
         font-weight: 600;
-        color: rgba(255,255,255,.70);
+        color: ${adminTheme.colors.textSoft};
       }
 
       .adminExpNotice {
         margin-top: 12px;
         padding: 12px;
-        border-radius: 12px;
-        background: #3b1014;
-        color: #ffd7d7;
-        border: 1px solid #7f1d1d;
+        border-radius: ${adminTheme.radius.md};
+        background: ${adminTheme.colors.dangerSoft};
+        color: ${adminTheme.colors.danger};
+        border: 1px solid ${adminTheme.colors.danger};
         font-weight: 700;
       }
 
@@ -793,31 +802,31 @@ export function AdminExportsPage() {
       }
 
       .adminExpTypeCard {
-        border: 1px solid rgba(255,255,255,.10);
+        border: 1px solid ${adminTheme.colors.border};
         border-radius: 16px;
-        background: #0d1517;
+        background: ${adminTheme.colors.panelSoft};
         padding: 14px;
         display: grid;
         gap: 10px;
       }
 
       .adminExpTypeCard.active {
-        border-color: #4bada9;
-        background: #132224;
+        border-color: ${adminTheme.colors.primary};
+        background: ${adminTheme.colors.primarySoft};
       }
 
       .adminExpTypeTitle {
         margin: 0;
         font-size: 16px;
         font-weight: 800;
-        color: #eef2f7;
+        color: ${adminTheme.colors.text};
       }
 
       .adminExpTypeText {
         margin: 0;
         font-size: 13px;
         font-weight: 600;
-        color: rgba(255,255,255,.72);
+        color: ${adminTheme.colors.textSoft};
         line-height: 1.45;
       }
 
@@ -833,14 +842,14 @@ export function AdminExportsPage() {
         gap: 8px;
         height: 40px;
         padding: 0 12px;
-        border: 1px solid rgba(255,255,255,.12);
-        border-radius: 12px;
-        background: #10191b;
+        border: 1px solid ${adminTheme.colors.border};
+        border-radius: ${adminTheme.radius.md};
+        background: ${adminTheme.colors.panelBg};
       }
 
       .adminExpSelectWrap label {
         font-size: 12px;
-        color: rgba(255,255,255,.70);
+        color: ${adminTheme.colors.textSoft};
         font-weight: 700;
         white-space: nowrap;
       }
@@ -851,17 +860,17 @@ export function AdminExportsPage() {
         background: transparent;
         border: none;
         outline: none;
-        color: #eef2f7;
+        color: ${adminTheme.colors.text};
         font-weight: 700;
       }
 
       .adminExpSelect option {
-        background: #10191b;
-        color: #eef2f7;
+        background: ${adminTheme.colors.panelBg};
+        color: ${adminTheme.colors.text};
       }
 
       .adminExpHint {
-        color: rgba(255,255,255,.72);
+        color: ${adminTheme.colors.textSoft};
         font-size: 13px;
         font-weight: 600;
         line-height: 1.45;
@@ -870,9 +879,9 @@ export function AdminExportsPage() {
       .adminExpTableWrap {
         margin-top: 12px;
         overflow: auto;
-        border: 1px solid rgba(255,255,255,.10);
+        border: 1px solid ${adminTheme.colors.border};
         border-radius: 14px;
-        background: #0d1517;
+        background: ${adminTheme.colors.panelSoft};
       }
 
       .adminExpTable {
@@ -885,33 +894,34 @@ export function AdminExportsPage() {
       .adminExpTable td {
         padding: 12px;
         text-align: left;
-        border-bottom: 1px solid rgba(255,255,255,.08);
+        border-bottom: 1px solid ${adminTheme.colors.border};
         font-size: 14px;
-        color: #eef2f7;
+        color: ${adminTheme.colors.text};
         vertical-align: middle;
       }
 
       .adminExpTable th {
-        color: rgba(255,255,255,.75);
+        color: ${adminTheme.colors.textSoft};
         font-weight: 800;
+        background: ${adminTheme.colors.panelAlt};
       }
 
       .adminExpMuted {
-        color: rgba(255,255,255,.62);
+        color: ${adminTheme.colors.textMuted};
         font-size: 13px;
       }
 
       .adminExpStatus {
         display: inline-flex;
         align-items: center;
-        height: 30px;
+        min-height: 30px;
         padding: 0 10px;
-        border-radius: 999px;
-        border: 1px solid rgba(255,255,255,.12);
-        background: #10191b;
+        border-radius: ${adminTheme.radius.pill};
+        border: 1px solid ${adminTheme.colors.border};
+        background: ${adminTheme.colors.panelBg};
         font-size: 12px;
         font-weight: 700;
-        color: #eef2f7;
+        color: ${adminTheme.colors.text};
       }
 
       .adminExpList {
@@ -921,20 +931,20 @@ export function AdminExportsPage() {
       }
 
       .adminExpListItem {
-        border: 1px solid rgba(255,255,255,.08);
+        border: 1px solid ${adminTheme.colors.border};
         border-radius: 14px;
-        background: #0d1517;
+        background: ${adminTheme.colors.panelSoft};
         padding: 12px;
       }
 
       .adminExpListItem strong {
         display: block;
         margin-bottom: 4px;
-        color: #eef2f7;
+        color: ${adminTheme.colors.text};
       }
 
       .adminExpListItem div {
-        color: rgba(255,255,255,.72);
+        color: ${adminTheme.colors.textSoft};
         font-size: 13px;
         line-height: 1.45;
         font-weight: 600;
@@ -943,7 +953,7 @@ export function AdminExportsPage() {
       .adminExpEmpty {
         padding: 24px 12px;
         text-align: center;
-        color: rgba(255,255,255,.70);
+        color: ${adminTheme.colors.textSoft};
         font-weight: 600;
       }
 

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import { useActiveMembership } from "../app/useActiveMembership";
 import { useNavigate } from "react-router-dom";
+import { adminTheme } from "../ui/adminTheme";
 
 type HistoryEntry = {
   id: string;
@@ -53,7 +54,7 @@ function BackIcon() {
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <path
         d="M15 18l-6-6 6-6"
-        stroke="#0f172a"
+        stroke="currentColor"
         strokeWidth="2.2"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -77,7 +78,7 @@ function ChevronIcon({ open }: { open: boolean }) {
     >
       <path
         d="M6 9l6 6 6-6"
-        stroke="#0f172a"
+        stroke="currentColor"
         strokeWidth="2.2"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -96,8 +97,6 @@ export function WorkerHistoryPage() {
   const [error, setError] = useState<string | null>(null);
 
   const [openDays, setOpenDays] = useState<Record<string, boolean>>({});
-
-  const solvento = "#4bada9";
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -180,31 +179,73 @@ export function WorkerHistoryPage() {
     }));
   }
 
-  if (!userId) return <div style={{ padding: 24 }}>Cargando usuario...</div>;
-  if (membershipLoading) return <div style={{ padding: 24 }}>Cargando empresa...</div>;
-  if (!membership) return <div style={{ padding: 24 }}>No hay empresa activa.</div>;
+  if (!userId) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          padding: 24,
+          color: adminTheme.colors.text,
+          background: adminTheme.colors.pageBg,
+        }}
+      >
+        Cargando usuario...
+      </div>
+    );
+  }
 
-  const card = {
-    background: "rgba(255,255,255,0.96)",
-    borderRadius: 22,
-    border: "1px solid rgba(15,23,42,0.08)",
-    boxShadow: "0 16px 40px rgba(2, 6, 23, 0.12)",
-    backdropFilter: "blur(6px)",
-  } as const;
+  if (membershipLoading) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          padding: 24,
+          color: adminTheme.colors.text,
+          background: adminTheme.colors.pageBg,
+        }}
+      >
+        Cargando empresa...
+      </div>
+    );
+  }
+
+  if (!membership) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          padding: 24,
+          color: adminTheme.colors.text,
+          background: adminTheme.colors.pageBg,
+        }}
+      >
+        No hay empresa activa.
+      </div>
+    );
+  }
 
   return (
     <div
       style={{
         minHeight: "100vh",
         width: "100%",
-        background: `linear-gradient(180deg, ${solvento} 0%, #3a9f9b 60%, #2f8e8a 100%)`,
+        background: `linear-gradient(180deg, ${adminTheme.colors.primary} 0%, ${adminTheme.colors.primarySoft} 100%)`,
         display: "flex",
         justifyContent: "center",
         padding: 14,
       }}
     >
       <div style={{ width: "100%", maxWidth: 520, display: "grid", gap: 12 }}>
-        <div style={{ ...card, padding: 14 }}>
+        <div
+          style={{
+            background: adminTheme.colors.panelBg,
+            borderRadius: 22,
+            border: `1px solid ${adminTheme.colors.border}`,
+            boxShadow: adminTheme.shadow.lg,
+            backdropFilter: "blur(6px)",
+            padding: 14,
+          }}
+        >
           <div
             style={{
               display: "flex",
@@ -218,8 +259,9 @@ export function WorkerHistoryPage() {
                 width: 46,
                 height: 46,
                 borderRadius: 14,
-                border: "1px solid rgba(15,23,42,0.08)",
-                background: "#fff",
+                border: `1px solid ${adminTheme.colors.border}`,
+                background: adminTheme.colors.panelSoft,
+                color: adminTheme.colors.text,
                 display: "grid",
                 placeItems: "center",
                 cursor: "pointer",
@@ -229,10 +271,22 @@ export function WorkerHistoryPage() {
             </button>
 
             <div>
-              <div style={{ fontSize: 18, fontWeight: 950, color: "#0f172a" }}>
+              <div
+                style={{
+                  fontSize: 18,
+                  fontWeight: 950,
+                  color: adminTheme.colors.text,
+                }}
+              >
                 Histórico
               </div>
-              <div style={{ fontSize: 12, color: "#64748b", fontWeight: 700 }}>
+              <div
+                style={{
+                  fontSize: 12,
+                  color: adminTheme.colors.textSoft,
+                  fontWeight: 700,
+                }}
+              >
                 Resumen diario de fichajes
               </div>
             </div>
@@ -240,17 +294,50 @@ export function WorkerHistoryPage() {
         </div>
 
         {loading && (
-          <div style={{ ...card, padding: 16, color: "#64748b" }}>Cargando histórico…</div>
+          <div
+            style={{
+              background: adminTheme.colors.panelBg,
+              borderRadius: 22,
+              border: `1px solid ${adminTheme.colors.border}`,
+              boxShadow: adminTheme.shadow.lg,
+              backdropFilter: "blur(6px)",
+              padding: 16,
+              color: adminTheme.colors.textSoft,
+            }}
+          >
+            Cargando histórico…
+          </div>
         )}
 
         {error && (
-          <div style={{ ...card, padding: 16, color: "crimson", fontWeight: 800 }}>
+          <div
+            style={{
+              background: adminTheme.colors.panelBg,
+              borderRadius: 22,
+              border: `1px solid ${adminTheme.colors.danger}`,
+              boxShadow: adminTheme.shadow.lg,
+              backdropFilter: "blur(6px)",
+              padding: 16,
+              color: adminTheme.colors.danger,
+              fontWeight: 800,
+            }}
+          >
             {error}
           </div>
         )}
 
         {!loading && !error && grouped.length === 0 && (
-          <div style={{ ...card, padding: 16, color: "#64748b" }}>
+          <div
+            style={{
+              background: adminTheme.colors.panelBg,
+              borderRadius: 22,
+              border: `1px solid ${adminTheme.colors.border}`,
+              boxShadow: adminTheme.shadow.lg,
+              backdropFilter: "blur(6px)",
+              padding: 16,
+              color: adminTheme.colors.textSoft,
+            }}
+          >
             No hay fichajes registrados.
           </div>
         )}
@@ -261,7 +348,17 @@ export function WorkerHistoryPage() {
             const isOpen = !!openDays[group.key];
 
             return (
-              <div key={group.key} style={{ ...card, padding: 12 }}>
+              <div
+                key={group.key}
+                style={{
+                  background: adminTheme.colors.panelBg,
+                  borderRadius: 22,
+                  border: `1px solid ${adminTheme.colors.border}`,
+                  boxShadow: adminTheme.shadow.lg,
+                  backdropFilter: "blur(6px)",
+                  padding: 12,
+                }}
+              >
                 <button
                   onClick={() => toggleDay(group.key)}
                   style={{
@@ -271,6 +368,7 @@ export function WorkerHistoryPage() {
                     padding: 0,
                     cursor: "pointer",
                     textAlign: "left",
+                    color: adminTheme.colors.text,
                   }}
                 >
                   <div
@@ -286,7 +384,7 @@ export function WorkerHistoryPage() {
                         style={{
                           fontSize: 15,
                           fontWeight: 950,
-                          color: "#0f172a",
+                          color: adminTheme.colors.text,
                           textTransform: "capitalize",
                         }}
                       >
@@ -296,7 +394,7 @@ export function WorkerHistoryPage() {
                         style={{
                           marginTop: 2,
                           fontSize: 12,
-                          color: "#64748b",
+                          color: adminTheme.colors.textSoft,
                           fontWeight: 700,
                         }}
                       >
@@ -308,7 +406,7 @@ export function WorkerHistoryPage() {
                       <div
                         style={{
                           fontSize: 12,
-                          color: "#64748b",
+                          color: adminTheme.colors.textSoft,
                           fontWeight: 800,
                         }}
                       >
@@ -318,7 +416,7 @@ export function WorkerHistoryPage() {
                         style={{
                           fontSize: 15,
                           fontWeight: 950,
-                          color: "#0f172a",
+                          color: adminTheme.colors.text,
                         }}
                       >
                         {hhmmFromMinutes(group.totalMinutes)}
@@ -329,7 +427,7 @@ export function WorkerHistoryPage() {
                       <div
                         style={{
                           fontSize: 12,
-                          color: "#64748b",
+                          color: adminTheme.colors.textSoft,
                           fontWeight: 800,
                         }}
                       >
@@ -340,10 +438,10 @@ export function WorkerHistoryPage() {
                           fontSize: 12,
                           fontWeight: 900,
                           color: group.hasOpen
-                            ? "#b45309"
+                            ? adminTheme.colors.danger
                             : group.hasIncident
-                            ? "#92400e"
-                            : "#166534",
+                            ? adminTheme.colors.danger
+                            : adminTheme.colors.success,
                         }}
                       >
                         {group.hasOpen
@@ -359,9 +457,11 @@ export function WorkerHistoryPage() {
                         width: 34,
                         height: 34,
                         borderRadius: 12,
-                        background: "rgba(15,23,42,0.05)",
+                        background: adminTheme.colors.panelSoft,
+                        color: adminTheme.colors.text,
                         display: "grid",
                         placeItems: "center",
+                        border: `1px solid ${adminTheme.colors.border}`,
                       }}
                     >
                       <ChevronIcon open={isOpen} />
@@ -390,8 +490,8 @@ export function WorkerHistoryPage() {
                           style={{
                             borderRadius: 16,
                             padding: 10,
-                            border: "1px solid rgba(15,23,42,0.08)",
-                            background: "rgba(248,250,252,1)",
+                            border: `1px solid ${adminTheme.colors.border}`,
+                            background: adminTheme.colors.panelSoft,
                             display: "grid",
                             gap: 8,
                           }}
@@ -407,7 +507,7 @@ export function WorkerHistoryPage() {
                             <div
                               style={{
                                 fontWeight: 900,
-                                color: "#0f172a",
+                                color: adminTheme.colors.text,
                                 fontSize: 14,
                               }}
                             >
@@ -420,12 +520,19 @@ export function WorkerHistoryPage() {
                                 fontWeight: 900,
                                 padding: "5px 9px",
                                 borderRadius: 999,
-                                background: hasIncident
-                                  ? "rgba(245, 158, 11, 0.14)"
-                                  : !item.check_out_at
-                                  ? "rgba(245, 158, 11, 0.14)"
-                                  : "rgba(15,23,42,0.06)",
-                                color: hasIncident || !item.check_out_at ? "#92400e" : "#334155",
+                                background:
+                                  hasIncident || !item.check_out_at
+                                    ? adminTheme.colors.dangerSoft
+                                    : adminTheme.colors.panelAlt,
+                                color:
+                                  hasIncident || !item.check_out_at
+                                    ? adminTheme.colors.danger
+                                    : adminTheme.colors.textSoft,
+                                border: `1px solid ${
+                                  hasIncident || !item.check_out_at
+                                    ? adminTheme.colors.danger
+                                    : adminTheme.colors.border
+                                }`,
                               }}
                             >
                               {!item.check_out_at
@@ -447,14 +554,14 @@ export function WorkerHistoryPage() {
                               style={{
                                 borderRadius: 14,
                                 padding: 10,
-                                background: "#fff",
-                                border: "1px solid rgba(15,23,42,0.06)",
+                                background: adminTheme.colors.panelBg,
+                                border: `1px solid ${adminTheme.colors.border}`,
                               }}
                             >
                               <div
                                 style={{
                                   fontSize: 11,
-                                  color: "#64748b",
+                                  color: adminTheme.colors.textMuted,
                                   fontWeight: 800,
                                 }}
                               >
@@ -464,7 +571,7 @@ export function WorkerHistoryPage() {
                                 style={{
                                   marginTop: 2,
                                   fontSize: 15,
-                                  color: "#0f172a",
+                                  color: adminTheme.colors.text,
                                   fontWeight: 950,
                                 }}
                               >
@@ -476,14 +583,14 @@ export function WorkerHistoryPage() {
                               style={{
                                 borderRadius: 14,
                                 padding: 10,
-                                background: "#fff",
-                                border: "1px solid rgba(15,23,42,0.06)",
+                                background: adminTheme.colors.panelBg,
+                                border: `1px solid ${adminTheme.colors.border}`,
                               }}
                             >
                               <div
                                 style={{
                                   fontSize: 11,
-                                  color: "#64748b",
+                                  color: adminTheme.colors.textMuted,
                                   fontWeight: 800,
                                 }}
                               >
@@ -493,7 +600,7 @@ export function WorkerHistoryPage() {
                                 style={{
                                   marginTop: 2,
                                   fontSize: 15,
-                                  color: "#0f172a",
+                                  color: adminTheme.colors.text,
                                   fontWeight: 950,
                                 }}
                               >
@@ -505,14 +612,14 @@ export function WorkerHistoryPage() {
                               style={{
                                 borderRadius: 14,
                                 padding: 10,
-                                background: "#fff",
-                                border: "1px solid rgba(15,23,42,0.06)",
+                                background: adminTheme.colors.panelBg,
+                                border: `1px solid ${adminTheme.colors.border}`,
                               }}
                             >
                               <div
                                 style={{
                                   fontSize: 11,
-                                  color: "#64748b",
+                                  color: adminTheme.colors.textMuted,
                                   fontWeight: 800,
                                 }}
                               >
@@ -522,7 +629,7 @@ export function WorkerHistoryPage() {
                                 style={{
                                   marginTop: 2,
                                   fontSize: 15,
-                                  color: "#0f172a",
+                                  color: adminTheme.colors.text,
                                   fontWeight: 950,
                                 }}
                               >

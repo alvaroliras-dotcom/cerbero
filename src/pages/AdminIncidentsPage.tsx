@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabaseClient";
 import { useActiveMembership } from "../app/useActiveMembership";
+import { adminTheme } from "../ui/adminTheme";
 
 // ======================================================
 // PARTE 1/6 — TIPOS Y HELPERS
@@ -164,9 +165,10 @@ export function AdminIncidentsPage() {
     if (email) return email;
     return userId;
   }
-// ======================================================
-// PARTE 3/6 — CARGA Y ACCIONES
-// ======================================================
+
+  // ======================================================
+  // PARTE 3/6 — CARGA Y ACCIONES
+  // ======================================================
 
   async function loadResolutionStats() {
     if (!membership) return;
@@ -428,9 +430,9 @@ export function AdminIncidentsPage() {
 
   const flags = selectedEntryGeo?.flags ?? null;
 
-// ======================================================
-// PARTE 5/6 — UI PRINCIPAL DE LA PÁGINA
-// ======================================================
+  // ======================================================
+  // PARTE 5/6 — UI PRINCIPAL DE LA PÁGINA
+  // ======================================================
 
   return (
     <div className="adminIncPageUi">
@@ -452,10 +454,10 @@ export function AdminIncidentsPage() {
           padding: 0 14px;
           display: inline-flex;
           align-items: center;
-          border: 1px solid rgba(255,255,255,.12);
+          border: 1px solid ${adminTheme.colors.border};
           border-radius: 12px;
-          background: #10191b;
-          color: rgba(255,255,255,.80);
+          background: ${adminTheme.colors.panelBg};
+          color: ${adminTheme.colors.textSoft};
           font-size: 13px;
           font-weight: 700;
         }
@@ -463,36 +465,40 @@ export function AdminIncidentsPage() {
         .adminIncInput {
           height: 40px;
           padding: 0 12px;
-          border: 1px solid rgba(255,255,255,.12);
+          border: 1px solid ${adminTheme.colors.border};
           border-radius: 12px;
-          background: #10191b;
-          color: #eef2f7;
+          background: ${adminTheme.colors.panelBg};
+          color: ${adminTheme.colors.text};
           outline: none;
           font-weight: 700;
           min-width: 240px;
         }
 
+        .adminIncInput::placeholder {
+          color: ${adminTheme.colors.textMuted};
+        }
+
         .adminIncBtn {
           height: 40px;
           padding: 0 16px;
-          border: 1px solid rgba(255,255,255,.12);
+          border: 1px solid ${adminTheme.colors.border};
           border-radius: 12px;
-          background: #162427;
-          color: #eef2f7;
+          background: ${adminTheme.colors.panelSoft};
+          color: ${adminTheme.colors.text};
           font-weight: 700;
           cursor: pointer;
         }
 
         .adminIncBtn.primary {
-          background: #4bada9;
-          color: #071012;
-          border-color: #4bada9;
+          background: ${adminTheme.colors.primary};
+          color: ${adminTheme.colors.textOnPrimary};
+          border-color: ${adminTheme.colors.primary};
         }
 
         .adminIncBtn.danger {
-          background: #7f1d1d;
+          background: ${adminTheme.colors.danger};
           color: #ffffff;
-          border-color: #991b1b;
+          border-color: ${adminTheme.colors.dangerHover};
         }
 
         .adminIncBtn:disabled {
@@ -507,29 +513,29 @@ export function AdminIncidentsPage() {
         }
 
         .adminIncKpi {
-          border: 1px solid rgba(255,255,255,.10);
+          border: 1px solid ${adminTheme.colors.border};
           border-radius: 18px;
-          background: #111c1f;
+          background: ${adminTheme.colors.cardBg};
           padding: 16px;
         }
 
         .adminIncKpiLabel {
           font-size: 13px;
           font-weight: 700;
-          color: rgba(255,255,255,.70);
+          color: ${adminTheme.colors.textSoft};
         }
 
         .adminIncKpiValue {
           margin-top: 8px;
           font-size: 26px;
           font-weight: 800;
-          color: #eef2f7;
+          color: ${adminTheme.colors.text};
         }
 
         .adminIncCard {
-          border: 1px solid rgba(255,255,255,.10);
+          border: 1px solid ${adminTheme.colors.border};
           border-radius: 18px;
-          background: #111c1f;
+          background: ${adminTheme.colors.cardBg};
           padding: 16px;
         }
 
@@ -537,22 +543,22 @@ export function AdminIncidentsPage() {
           margin: 0;
           font-size: 18px;
           font-weight: 800;
-          color: #eef2f7;
+          color: ${adminTheme.colors.text};
         }
 
         .adminIncCardSub {
           margin: 4px 0 0 0;
           font-size: 13px;
           font-weight: 600;
-          color: rgba(255,255,255,.70);
+          color: ${adminTheme.colors.textSoft};
         }
 
         .adminIncTableWrap {
           margin-top: 12px;
           overflow: auto;
-          border: 1px solid rgba(255,255,255,.10);
+          border: 1px solid ${adminTheme.colors.border};
           border-radius: 14px;
-          background: #0d1517;
+          background: ${adminTheme.colors.panelBg};
         }
 
         .adminIncTable {
@@ -565,14 +571,14 @@ export function AdminIncidentsPage() {
         .adminIncTable td {
           padding: 12px;
           text-align: left;
-          border-bottom: 1px solid rgba(255,255,255,.08);
+          border-bottom: 1px solid ${adminTheme.colors.border};
           font-size: 14px;
-          color: #eef2f7;
+          color: ${adminTheme.colors.text};
           vertical-align: middle;
         }
 
         .adminIncTable th {
-          color: rgba(255,255,255,.75);
+          color: ${adminTheme.colors.textSoft};
           font-weight: 800;
         }
 
@@ -583,14 +589,14 @@ export function AdminIncidentsPage() {
         .adminIncEmpty {
           padding: 24px 12px;
           text-align: center;
-          color: rgba(255,255,255,.70);
+          color: ${adminTheme.colors.textSoft};
           font-weight: 600;
         }
 
         .adminIncModalOverlay {
           position: fixed;
           inset: 0;
-          background: rgba(0,0,0,.68);
+          background: ${adminTheme.colors.overlay};
           display: flex;
           align-items: center;
           justify-content: center;
@@ -601,11 +607,11 @@ export function AdminIncidentsPage() {
         .adminIncModalCard {
           width: min(1680px, 100%);
           min-height: min(900px, calc(100vh - 36px));
-          border: 1px solid rgba(255,255,255,.12);
+          border: 1px solid ${adminTheme.colors.border};
           border-radius: 24px;
-          background: #111c1f;
+          background: ${adminTheme.colors.cardBg};
           padding: 18px;
-          box-shadow: 0 24px 60px rgba(0,0,0,.35);
+          box-shadow: ${adminTheme.shadows.lg};
           overflow: hidden;
           display: grid;
           grid-template-rows: auto 1fr;
@@ -623,13 +629,13 @@ export function AdminIncidentsPage() {
           margin: 0;
           font-size: 24px;
           font-weight: 900;
-          color: #eef2f7;
+          color: ${adminTheme.colors.text};
         }
 
         .adminIncModalSub {
           font-size: 13px;
           font-weight: 700;
-          color: rgba(255,255,255,.68);
+          color: ${adminTheme.colors.textSoft};
         }
 
         .adminIncModalShell {
@@ -659,9 +665,9 @@ export function AdminIncidentsPage() {
         }
 
         .adminIncPanel {
-          border: 1px solid rgba(255,255,255,.08);
+          border: 1px solid ${adminTheme.colors.border};
           border-radius: 16px;
-          background: #0d1517;
+          background: ${adminTheme.colors.panelBg};
           padding: 14px;
         }
 
@@ -669,7 +675,7 @@ export function AdminIncidentsPage() {
           margin: 0 0 10px 0;
           font-size: 15px;
           font-weight: 900;
-          color: #eef2f7;
+          color: ${adminTheme.colors.text};
         }
 
         .adminIncInfoList {
@@ -679,15 +685,15 @@ export function AdminIncidentsPage() {
 
         .adminIncInfoItem {
           padding: 12px;
-          border: 1px solid rgba(255,255,255,.08);
+          border: 1px solid ${adminTheme.colors.border};
           border-radius: 14px;
-          background: #10191b;
+          background: ${adminTheme.colors.panelSoft};
         }
 
         .adminIncInfoLabel {
           font-size: 11px;
           font-weight: 800;
-          color: rgba(255,255,255,.62);
+          color: ${adminTheme.colors.textMuted};
           margin-bottom: 5px;
           text-transform: uppercase;
           letter-spacing: .02em;
@@ -696,7 +702,7 @@ export function AdminIncidentsPage() {
         .adminIncInfoValue {
           font-size: 15px;
           font-weight: 800;
-          color: #eef2f7;
+          color: ${adminTheme.colors.text};
           word-break: break-word;
         }
 
@@ -708,13 +714,18 @@ export function AdminIncidentsPage() {
         .adminIncModalInput,
         .adminIncModalTextarea {
           width: 100%;
-          border: 1px solid rgba(255,255,255,.12);
+          border: 1px solid ${adminTheme.colors.border};
           border-radius: 12px;
-          background: #10191b;
-          color: #eef2f7;
+          background: ${adminTheme.colors.panelSoft};
+          color: ${adminTheme.colors.text};
           outline: none;
           font-weight: 700;
           padding: 10px 12px;
+        }
+
+        .adminIncModalTextarea::placeholder,
+        .adminIncModalInput::placeholder {
+          color: ${adminTheme.colors.textMuted};
         }
 
         .adminIncModalTextarea {
@@ -734,22 +745,22 @@ export function AdminIncidentsPage() {
           flex-wrap: wrap;
           padding: 14px;
           border-radius: 14px;
-          background: #10191b;
-          border: 1px solid rgba(255,255,255,.06);
+          background: ${adminTheme.colors.panelSoft};
+          border: 1px solid ${adminTheme.colors.border};
         }
 
         .adminIncContextDot {
           width: 10px;
           height: 10px;
           border-radius: 999px;
-          background: #4bada9;
+          background: ${adminTheme.colors.primary};
           flex: 0 0 auto;
         }
 
         .adminIncContextText {
           font-size: 14px;
           font-weight: 700;
-          color: #eef2f7;
+          color: ${adminTheme.colors.text};
         }
 
         .adminIncGeoGrid {
@@ -763,9 +774,9 @@ export function AdminIncidentsPage() {
           display: grid;
           gap: 12px;
           padding: 14px;
-          border: 1px solid rgba(255,255,255,.08);
+          border: 1px solid ${adminTheme.colors.border};
           border-radius: 16px;
-          background: #0d1517;
+          background: ${adminTheme.colors.panelBg};
           min-height: 0;
         }
 
@@ -779,7 +790,7 @@ export function AdminIncidentsPage() {
         .adminIncGeoCardTitle {
           font-size: 15px;
           font-weight: 900;
-          color: #eef2f7;
+          color: ${adminTheme.colors.text};
         }
 
         .adminIncGeoCardBadge {
@@ -788,9 +799,9 @@ export function AdminIncidentsPage() {
           height: 28px;
           padding: 0 10px;
           border-radius: 999px;
-          background: rgba(75,173,169,.16);
-          border: 1px solid rgba(75,173,169,.28);
-          color: #9ce4df;
+          background: ${adminTheme.colors.primarySoft};
+          border: 1px solid ${adminTheme.colors.primaryBorder};
+          color: ${adminTheme.colors.primary};
           font-size: 12px;
           font-weight: 800;
         }
@@ -804,14 +815,14 @@ export function AdminIncidentsPage() {
         .adminIncGeoMetaItem {
           padding: 10px 12px;
           border-radius: 12px;
-          background: #10191b;
-          border: 1px solid rgba(255,255,255,.06);
+          background: ${adminTheme.colors.panelSoft};
+          border: 1px solid ${adminTheme.colors.border};
         }
 
         .adminIncGeoMetaLabel {
           font-size: 11px;
           font-weight: 800;
-          color: rgba(255,255,255,.62);
+          color: ${adminTheme.colors.textMuted};
           margin-bottom: 4px;
           text-transform: uppercase;
           letter-spacing: .02em;
@@ -820,7 +831,7 @@ export function AdminIncidentsPage() {
         .adminIncGeoMetaValue {
           font-size: 13px;
           font-weight: 700;
-          color: #eef2f7;
+          color: ${adminTheme.colors.text};
           word-break: break-word;
         }
 
@@ -829,11 +840,11 @@ export function AdminIncidentsPage() {
           height: 320px;
           border: 0;
           border-radius: 14px;
-          background: #0b1113;
+          background: ${adminTheme.colors.panelSoft};
         }
 
         .adminIncMapLink {
-          color: #7dd3fc;
+          color: ${adminTheme.colors.link};
           font-size: 13px;
           font-weight: 700;
           text-decoration: none;
@@ -846,16 +857,8 @@ export function AdminIncidentsPage() {
         .adminIncActionText {
           font-size: 14px;
           font-weight: 700;
-          color: rgba(255,255,255,.82);
+          color: ${adminTheme.colors.textSoft};
           line-height: 1.45;
-        }
-
-        .adminIncModalActions {
-          display: flex;
-          gap: 8px;
-          justify-content: flex-end;
-          flex-wrap: wrap;
-          margin-top: auto;
         }
 
         @media (max-width: 1380px) {
@@ -939,7 +942,9 @@ export function AdminIncidentsPage() {
 
         <div className="adminIncKpi">
           <div className="adminIncKpiLabel">Total incidencias</div>
-          <div className="adminIncKpiValue">{incidents.length + validatedToday + rejectedToday}</div>
+          <div className="adminIncKpiValue">
+            {incidents.length + validatedToday + rejectedToday}
+          </div>
         </div>
       </section>
 
@@ -995,9 +1000,10 @@ export function AdminIncidentsPage() {
         </div>
       </section>
 
-// ======================================================
-// PARTE 6/6 — UI PRINCIPAL DEL MODAL
-// ======================================================
+   // ======================================================
+  // PARTE 6/6 — UI PRINCIPAL DEL MODAL
+  // ======================================================
+ 
 
       {selectedIncident && (
         <div

@@ -11,8 +11,10 @@ export const adminTheme = {
 
   colors: {
     appBg: "#F5F7FA",
+    pageBg: "#F5F7FA",
 
     panelBg: "#FFFFFF",
+    cardBg: "#FFFFFF",
     panelSoft: "#F8FAFC",
     panelAlt: "#EEF2F6",
 
@@ -27,6 +29,7 @@ export const adminTheme = {
     primary: "#4BADA9",
     primaryHover: "#3D9894",
     primarySoft: "#DDF4F3",
+    primaryBorder: "#3D9894",
 
     secondaryBg: "#F3F4F6",
     secondaryHover: "#E5E7EB",
@@ -42,6 +45,7 @@ export const adminTheme = {
     dangerSoft: "#FEE4E2",
 
     info: "#0EA5E9",
+    link: "#3D9894",
     overlay: "rgba(15, 23, 42, 0.42)",
   },
 
@@ -54,6 +58,12 @@ export const adminTheme = {
   },
 
   shadow: {
+    sm: "0 6px 14px rgba(15, 23, 42, 0.06)",
+    md: "0 12px 28px rgba(15, 23, 42, 0.08)",
+    lg: "0 18px 40px rgba(15, 23, 42, 0.12)",
+  },
+
+  shadows: {
     sm: "0 6px 14px rgba(15, 23, 42, 0.06)",
     md: "0 12px 28px rgba(15, 23, 42, 0.08)",
     lg: "0 18px 40px rgba(15, 23, 42, 0.12)",

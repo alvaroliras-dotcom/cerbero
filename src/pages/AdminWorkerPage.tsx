@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { supabase } from "../lib/supabaseClient";
 import { useActiveMembership } from "../app/useActiveMembership";
+import { adminTheme } from "../ui/adminTheme";
 
 // ======================================================
 // PARTE 1/6 — TIPOS Y HELPERS
@@ -466,9 +467,47 @@ export function AdminWorkerPage() {
     range.toIsoExclusive,
   ]);
 
-  if (membershipLoading) return <div style={{ padding: 24 }}>Cargando…</div>;
-  if (!membership) return <div style={{ padding: 24 }}>Sin empresa activa.</div>;
-  if (!userId) return <div style={{ padding: 24 }}>Falta userId.</div>;
+  if (membershipLoading) {
+    return (
+      <div
+        style={{
+          padding: 24,
+          color: adminTheme.colors.text,
+          background: adminTheme.colors.pageBg,
+        }}
+      >
+        Cargando…
+      </div>
+    );
+  }
+
+  if (!membership) {
+    return (
+      <div
+        style={{
+          padding: 24,
+          color: adminTheme.colors.text,
+          background: adminTheme.colors.pageBg,
+        }}
+      >
+        Sin empresa activa.
+      </div>
+    );
+  }
+
+  if (!userId) {
+    return (
+      <div
+        style={{
+          padding: 24,
+          color: adminTheme.colors.text,
+          background: adminTheme.colors.pageBg,
+        }}
+      >
+        Falta userId.
+      </div>
+    );
+  }
 
   // ======================================================
   // PARTE 6/6 — UI DE LA PÁGINA
@@ -492,17 +531,19 @@ export function AdminWorkerPage() {
         .adminWorkerPill {
           height: 40px;
           padding: 0 14px;
-          border: 1px solid rgba(255,255,255,.12);
-          border-radius: 12px;
-          background: #162427;
-          color: #eef2f7;
+          border: 1px solid ${adminTheme.colors.border};
+          border-radius: ${adminTheme.radius.md};
+          background: ${adminTheme.colors.panelSoft};
+          color: ${adminTheme.colors.text};
           font-weight: 700;
           cursor: pointer;
+          transition: background .18s ease, border-color .18s ease, color .18s ease;
         }
 
         .adminWorkerPill.active {
-          background: #1f4f52;
-          border-color: #4bada9;
+          background: ${adminTheme.colors.primarySoft};
+          border-color: ${adminTheme.colors.primary};
+          color: ${adminTheme.colors.primary};
         }
 
         .adminWorkerField {
@@ -511,40 +552,50 @@ export function AdminWorkerPage() {
           gap: 8px;
           height: 40px;
           padding: 0 12px;
-          border: 1px solid rgba(255,255,255,.12);
-          border-radius: 12px;
-          background: #10191b;
+          border: 1px solid ${adminTheme.colors.border};
+          border-radius: ${adminTheme.radius.md};
+          background: ${adminTheme.colors.panelBg};
         }
 
         .adminWorkerField input {
           background: transparent;
           border: none;
           outline: none;
-          color: #eef2f7;
+          color: ${adminTheme.colors.text};
           font-weight: 700;
+        }
+
+        .adminWorkerField input[type="date"] {
+          color-scheme: light;
+        }
+
+        .adminWorkerField input[type="date"]::-webkit-calendar-picker-indicator {
+          opacity: 1;
+          cursor: pointer;
         }
 
         .adminWorkerBtn {
           height: 40px;
           padding: 0 16px;
-          border: 1px solid rgba(255,255,255,.12);
-          border-radius: 12px;
-          background: #162427;
-          color: #eef2f7;
+          border: 1px solid ${adminTheme.colors.border};
+          border-radius: ${adminTheme.radius.md};
+          background: ${adminTheme.colors.panelSoft};
+          color: ${adminTheme.colors.text};
           font-weight: 700;
           cursor: pointer;
+          transition: background .18s ease, border-color .18s ease, color .18s ease, opacity .18s ease;
         }
 
         .adminWorkerBtn.primary {
-          background: #4bada9;
-          color: #071012;
-          border-color: #4bada9;
+          background: ${adminTheme.colors.primary};
+          color: ${adminTheme.colors.textOnPrimary};
+          border-color: ${adminTheme.colors.primary};
         }
 
         .adminWorkerBtn.danger {
-          background: #7f1d1d;
-          color: #ffffff;
-          border-color: #991b1b;
+          background: ${adminTheme.colors.dangerSoft};
+          color: ${adminTheme.colors.danger};
+          border-color: ${adminTheme.colors.danger};
         }
 
         .adminWorkerBtn:disabled {
@@ -563,33 +614,34 @@ export function AdminWorkerPage() {
           padding: 0 14px;
           display: inline-flex;
           align-items: center;
-          border: 1px solid rgba(255,255,255,.12);
-          border-radius: 12px;
-          background: #10191b;
-          color: rgba(255,255,255,.80);
+          border: 1px solid ${adminTheme.colors.border};
+          border-radius: ${adminTheme.radius.md};
+          background: ${adminTheme.colors.panelBg};
+          color: ${adminTheme.colors.textSoft};
           font-size: 13px;
           font-weight: 700;
         }
 
         .adminWorkerCard {
-          border: 1px solid rgba(255,255,255,.10);
+          border: 1px solid ${adminTheme.colors.border};
           border-radius: 18px;
-          background: #111c1f;
+          background: ${adminTheme.colors.panelBg};
           padding: 16px;
+          box-shadow: ${adminTheme.shadow.sm};
         }
 
         .adminWorkerCardTitle {
           margin: 0;
           font-size: 18px;
           font-weight: 800;
-          color: #eef2f7;
+          color: ${adminTheme.colors.text};
         }
 
         .adminWorkerCardSub {
           margin: 4px 0 0 0;
           font-size: 13px;
           font-weight: 600;
-          color: rgba(255,255,255,.70);
+          color: ${adminTheme.colors.textSoft};
         }
 
         .adminWorkerStats {
@@ -600,32 +652,32 @@ export function AdminWorkerPage() {
         }
 
         .adminWorkerStat {
-          border: 1px solid rgba(255,255,255,.10);
+          border: 1px solid ${adminTheme.colors.border};
           border-radius: 16px;
-          background: #0d1517;
+          background: ${adminTheme.colors.panelSoft};
           padding: 14px;
         }
 
         .adminWorkerStatLabel {
           font-size: 13px;
           font-weight: 700;
-          color: rgba(255,255,255,.70);
+          color: ${adminTheme.colors.textSoft};
         }
 
         .adminWorkerStatValue {
           margin-top: 8px;
           font-size: 24px;
           font-weight: 800;
-          color: #eef2f7;
+          color: ${adminTheme.colors.text};
         }
 
         .adminWorkerNotice {
           margin-top: 12px;
           padding: 12px;
-          border-radius: 12px;
-          background: #3b1014;
-          color: #ffd7d7;
-          border: 1px solid #7f1d1d;
+          border-radius: ${adminTheme.radius.md};
+          background: ${adminTheme.colors.dangerSoft};
+          color: ${adminTheme.colors.danger};
+          border: 1px solid ${adminTheme.colors.danger};
           font-weight: 700;
         }
 
@@ -634,12 +686,13 @@ export function AdminWorkerPage() {
           margin-top: 12px;
           height: 40px;
           padding: 0 12px;
-          border: 1px solid rgba(255,255,255,.12);
-          border-radius: 12px;
-          background: #10191b;
-          color: #eef2f7;
+          border: 1px solid ${adminTheme.colors.border};
+          border-radius: ${adminTheme.radius.md};
+          background: ${adminTheme.colors.panelBg};
+          color: ${adminTheme.colors.text};
           outline: none;
           font-weight: 700;
+          box-sizing: border-box;
         }
 
         .adminWorkerList {
@@ -649,9 +702,9 @@ export function AdminWorkerPage() {
         }
 
         .adminWorkerIncident {
-          border: 1px solid rgba(255,255,255,.10);
+          border: 1px solid ${adminTheme.colors.border};
           border-radius: 16px;
-          background: #0d1517;
+          background: ${adminTheme.colors.panelSoft};
           padding: 14px;
         }
 
@@ -659,7 +712,7 @@ export function AdminWorkerPage() {
           display: grid;
           gap: 6px;
           margin-bottom: 12px;
-          color: #eef2f7;
+          color: ${adminTheme.colors.text};
           font-size: 14px;
         }
 
@@ -671,16 +724,16 @@ export function AdminWorkerPage() {
 
         .adminWorkerEmpty {
           margin-top: 12px;
-          color: rgba(255,255,255,.70);
+          color: ${adminTheme.colors.textSoft};
           font-weight: 600;
         }
 
         .adminWorkerTableWrap {
           margin-top: 12px;
           overflow: auto;
-          border: 1px solid rgba(255,255,255,.10);
+          border: 1px solid ${adminTheme.colors.border};
           border-radius: 14px;
-          background: #0d1517;
+          background: ${adminTheme.colors.panelSoft};
         }
 
         .adminWorkerTable {
@@ -693,15 +746,16 @@ export function AdminWorkerPage() {
         .adminWorkerTable td {
           padding: 12px;
           text-align: left;
-          border-bottom: 1px solid rgba(255,255,255,.08);
+          border-bottom: 1px solid ${adminTheme.colors.border};
           font-size: 14px;
-          color: #eef2f7;
+          color: ${adminTheme.colors.text};
           vertical-align: middle;
         }
 
         .adminWorkerTable th {
-          color: rgba(255,255,255,.75);
+          color: ${adminTheme.colors.textSoft};
           font-weight: 800;
+          background: ${adminTheme.colors.panelAlt};
         }
 
         .adminWorkerStatus {
@@ -709,12 +763,12 @@ export function AdminWorkerPage() {
           align-items: center;
           min-height: 30px;
           padding: 4px 10px;
-          border-radius: 999px;
-          border: 1px solid rgba(255,255,255,.12);
-          background: #10191b;
+          border-radius: ${adminTheme.radius.pill};
+          border: 1px solid ${adminTheme.colors.border};
+          background: ${adminTheme.colors.panelBg};
           font-size: 12px;
           font-weight: 700;
-          color: #eef2f7;
+          color: ${adminTheme.colors.text};
         }
 
         .adminWorkerGeoModalOverlay {
@@ -732,11 +786,11 @@ export function AdminWorkerPage() {
           width: min(1100px, 100%);
           max-height: calc(100vh - 40px);
           overflow: auto;
-          border: 1px solid rgba(255,255,255,.12);
+          border: 1px solid ${adminTheme.colors.border};
           border-radius: 20px;
-          background: #111c1f;
+          background: ${adminTheme.colors.panelBg};
           padding: 18px;
-          box-shadow: 0 24px 60px rgba(0,0,0,.35);
+          box-shadow: ${adminTheme.shadow.lg};
         }
 
         .adminWorkerGeoHeader {
@@ -751,14 +805,14 @@ export function AdminWorkerPage() {
           margin: 0;
           font-size: 20px;
           font-weight: 900;
-          color: #eef2f7;
+          color: ${adminTheme.colors.text};
         }
 
         .adminWorkerGeoSub {
           margin-top: 4px;
           font-size: 13px;
           font-weight: 700;
-          color: rgba(255,255,255,.68);
+          color: ${adminTheme.colors.textSoft};
         }
 
         .adminWorkerGeoGrid {
@@ -771,15 +825,15 @@ export function AdminWorkerPage() {
           display: grid;
           gap: 12px;
           padding: 14px;
-          border: 1px solid rgba(255,255,255,.08);
+          border: 1px solid ${adminTheme.colors.border};
           border-radius: 16px;
-          background: #0d1517;
+          background: ${adminTheme.colors.panelSoft};
         }
 
         .adminWorkerGeoCardTitle {
           font-size: 15px;
           font-weight: 900;
-          color: #eef2f7;
+          color: ${adminTheme.colors.text};
         }
 
         .adminWorkerGeoMetaGrid {
@@ -791,14 +845,14 @@ export function AdminWorkerPage() {
         .adminWorkerGeoMetaItem {
           padding: 10px 12px;
           border-radius: 12px;
-          background: #10191b;
-          border: 1px solid rgba(255,255,255,.06);
+          background: ${adminTheme.colors.panelBg};
+          border: 1px solid ${adminTheme.colors.border};
         }
 
         .adminWorkerGeoMetaLabel {
           font-size: 11px;
           font-weight: 800;
-          color: rgba(255,255,255,.62);
+          color: ${adminTheme.colors.textMuted};
           margin-bottom: 4px;
           text-transform: uppercase;
           letter-spacing: .02em;
@@ -807,7 +861,7 @@ export function AdminWorkerPage() {
         .adminWorkerGeoMetaValue {
           font-size: 13px;
           font-weight: 700;
-          color: #eef2f7;
+          color: ${adminTheme.colors.text};
           word-break: break-word;
         }
 
@@ -816,11 +870,11 @@ export function AdminWorkerPage() {
           height: 320px;
           border: 0;
           border-radius: 14px;
-          background: #0b1113;
+          background: ${adminTheme.colors.panelAlt};
         }
 
         .adminWorkerGeoLink {
-          color: #7dd3fc;
+          color: ${adminTheme.colors.primary};
           font-size: 13px;
           font-weight: 700;
           text-decoration: none;

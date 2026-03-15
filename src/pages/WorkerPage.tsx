@@ -9,6 +9,7 @@ import {
 import { useActiveMembership } from "../app/useActiveMembership";
 import { useRegisterPushDevice } from "../app/useRegisterPushDevice";
 import { useNavigate } from "react-router-dom";
+import { adminTheme } from "../ui/adminTheme";
 
 // ======================================================
 // PARTE 1/6 — TIPOS Y HELPERS
@@ -103,15 +104,15 @@ function BracketArrowIcon({ direction }: { direction: "in" | "out" }) {
       <g transform={flip ? "translate(48,0) scale(-1,1)" : undefined}>
         <path
           d="M28 10H34V38H28"
-          stroke="white"
+          stroke="currentColor"
           strokeWidth="3.6"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
-        <path d="M12 24H27" stroke="white" strokeWidth="3.6" strokeLinecap="round" />
+        <path d="M12 24H27" stroke="currentColor" strokeWidth="3.6" strokeLinecap="round" />
         <path
           d="M22 18.5L27.5 24L22 29.5"
-          stroke="white"
+          stroke="currentColor"
           strokeWidth="3.6"
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -142,13 +143,14 @@ function IconButton({
         width: 64,
         height: 64,
         borderRadius: 18,
-        border: "1px solid rgba(15,23,42,0.10)",
-        background: "rgba(248,250,252,1)",
+        border: `1px solid ${adminTheme.colors.border}`,
+        background: adminTheme.colors.panelSoft,
+        color: adminTheme.colors.text,
         display: "grid",
         placeItems: "center",
         cursor: disabled ? "not-allowed" : "pointer",
         opacity: disabled ? 0.45 : 1,
-        boxShadow: "0 6px 14px rgba(2, 6, 23, 0.06)",
+        boxShadow: adminTheme.shadow.sm,
       }}
     >
       {children}
@@ -161,12 +163,12 @@ function SettingsIcon() {
     <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <path
         d="M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4Z"
-        stroke="#0f172a"
+        stroke="currentColor"
         strokeWidth="2"
       />
       <path
         d="M19.4 12a7.6 7.6 0 0 0-.1-1l2-1.5-2-3.4-2.4 1a7.8 7.8 0 0 0-1.7-1l-.4-2.6H9.2l-.4 2.6a7.8 7.8 0 0 0-1.7 1l-2.4-1-2 3.4 2 1.5a7.6 7.6 0 0 0 0 2l-2 1.5 2 3.4 2.4-1c.5.4 1.1.8 1.7 1l.4 2.6h5.6l.4-2.6c.6-.2 1.2-.6 1.7-1l2.4 1 2-3.4-2-1.5c.1-.3.1-.6.1-1Z"
-        stroke="#0f172a"
+        stroke="currentColor"
         strokeWidth="2"
         strokeLinejoin="round"
       />
@@ -179,20 +181,20 @@ function HistoryIcon() {
     <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <path
         d="M12 8v5l3 2"
-        stroke="#0f172a"
+        stroke="currentColor"
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
         d="M3 12a9 9 0 1 0 3-6.7"
-        stroke="#0f172a"
+        stroke="currentColor"
         strokeWidth="2"
         strokeLinecap="round"
       />
       <path
         d="M3 5v4h4"
-        stroke="#0f172a"
+        stroke="currentColor"
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -206,14 +208,14 @@ function LogoutIcon() {
     <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <path
         d="M10 7V6a2 2 0 0 1 2-2h7v16h-7a2 2 0 0 1-2-2v-1"
-        stroke="#0f172a"
+        stroke="currentColor"
         strokeWidth="2"
         strokeLinejoin="round"
       />
-      <path d="M4 12h10" stroke="#0f172a" strokeWidth="2" strokeLinecap="round" />
+      <path d="M4 12h10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
       <path
         d="M8 8l-4 4 4 4"
-        stroke="#0f172a"
+        stroke="currentColor"
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -244,10 +246,6 @@ export function WorkerPage() {
 
   const goalHours = 8;
   const goalMinutes = goalHours * 60;
-
-  const brand = "#4bada9";
-  const enterColor = "#16a34a";
-  const exitColor = "#ef4444";
 
   const activeCompany = membership?.company_id ?? null;
   const { data: openEntry, isLoading } = useOpenEntry(activeCompany, userId);
@@ -365,76 +363,74 @@ export function WorkerPage() {
     (isOpen && checkOut.isPending) || (!isOpen && checkIn.isPending);
 
   const mainLabel = isOpen ? "SALIR" : "ENTRAR";
-  const mainBg = isOpen ? exitColor : enterColor;
   const todayShown = todayEntries.slice(0, 2);
 
+  // ======================================================
+  // PARTE 4/6 — CARGA Y ACCIONES
+  // ======================================================
 
-// ======================================================
-// PARTE 4/6 — CARGA Y ACCIONES
-// ======================================================
+  async function loadHistory() {
+    if (!activeCompany || !userId) return;
 
-async function loadHistory() {
-  if (!activeCompany || !userId) return;
+    setHistoryLoading(true);
+    setHistoryError(null);
 
-  setHistoryLoading(true);
-  setHistoryError(null);
+    const { data, error } = await supabase
+      .from("time_entries")
+      .select("id,check_in_at,check_out_at,workflow_status")
+      .eq("company_id", activeCompany)
+      .eq("user_id", userId)
+      .order("check_in_at", { ascending: false })
+      .limit(50);
 
-  const { data, error } = await supabase
-    .from("time_entries")
-    .select("id,check_in_at,check_out_at,workflow_status")
-    .eq("company_id", activeCompany)
-    .eq("user_id", userId)
-    .order("check_in_at", { ascending: false })
-    .limit(50);
+    if (error) {
+      setHistoryError(error.message);
+      setHistory([]);
+      setHistoryLoading(false);
+      return;
+    }
 
-  if (error) {
-    setHistoryError(error.message);
-    setHistory([]);
+    setHistory((data ?? []) as HistoryEntry[]);
     setHistoryLoading(false);
-    return;
   }
 
-  setHistory((data ?? []) as HistoryEntry[]);
-  setHistoryLoading(false);
-}
+  async function onMainPress() {
+    if (isMainBlocked) return;
 
-async function onMainPress() {
-  if (isMainBlocked) return;
+    const geo = await getCurrentPosition();
 
-  const geo = await getCurrentPosition();
+    if (!isOpen) {
+      checkIn.mutate(geo, { onSuccess: () => loadHistory() });
+      return;
+    }
 
-  if (!isOpen) {
-    checkIn.mutate(geo, { onSuccess: () => loadHistory() });
-    return;
+    if (openEntry) {
+      checkOut.mutate(
+        { entryId: openEntry.id, geo },
+        { onSuccess: () => loadHistory() }
+      );
+    }
   }
 
-  if (openEntry) {
-    checkOut.mutate(
-      { entryId: openEntry.id, geo },
-      { onSuccess: () => loadHistory() }
-    );
+  async function onSubmitAdjustment() {
+    if (!adjustmentTarget) return;
+
+    const reason = adjustReason.trim();
+    if (reason.length < 3) return;
+
+    try {
+      await createAdjustment.mutateAsync({
+        timeEntryId: adjustmentTarget.id,
+        proposedCheckOut: new Date().toISOString(),
+        reason,
+      });
+
+      setAdjustReason("");
+      await loadHistory();
+    } catch (err) {
+      console.error(err);
+    }
   }
-}
-
-async function onSubmitAdjustment() {
-  if (!adjustmentTarget) return;
-
-  const reason = adjustReason.trim();
-  if (reason.length < 3) return;
-
-  try {
-    await createAdjustment.mutateAsync({
-      timeEntryId: adjustmentTarget.id,
-      proposedCheckOut: new Date().toISOString(),
-      reason,
-    });
-
-    setAdjustReason("");
-    await loadHistory();
-  } catch (err) {
-    console.error(err);
-  }
-}
 
   // ======================================================
   // PARTE 5/6 — EFECTOS Y ESTADOS BASE
@@ -464,10 +460,65 @@ async function onSubmitAdjustment() {
     }
   }, [requiresNewProposal]);
 
-  if (!userId) return <div className="container">Cargando usuario...</div>;
-  if (membershipLoading) return <div className="container">Cargando empresa...</div>;
-  if (!membership) return <div className="container">No hay empresa activa.</div>;
-  if (isLoading) return <div className="container">Cargando estado...</div>;
+  if (!userId) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          padding: 24,
+          color: adminTheme.colors.text,
+          background: adminTheme.colors.pageBg,
+        }}
+      >
+        Cargando usuario...
+      </div>
+    );
+  }
+
+  if (membershipLoading) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          padding: 24,
+          color: adminTheme.colors.text,
+          background: adminTheme.colors.pageBg,
+        }}
+      >
+        Cargando empresa...
+      </div>
+    );
+  }
+
+  if (!membership) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          padding: 24,
+          color: adminTheme.colors.text,
+          background: adminTheme.colors.pageBg,
+        }}
+      >
+        No hay empresa activa.
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          padding: 24,
+          color: adminTheme.colors.text,
+          background: adminTheme.colors.pageBg,
+        }}
+      >
+        Cargando estado...
+      </div>
+    );
+  }
 
   // ======================================================
   // PARTE 6/6 — UI DE LA PÁGINA
@@ -479,7 +530,7 @@ async function onSubmitAdjustment() {
       style={{
         minHeight: "100vh",
         width: "100%",
-        background: `linear-gradient(180deg, ${brand} 0%, #3a9f9b 60%, #2f8e8a 100%)`,
+        background: `linear-gradient(180deg, ${adminTheme.colors.primary} 0%, ${adminTheme.colors.primarySoft} 100%)`,
         display: "flex",
         justifyContent: "center",
         padding: 14,
@@ -498,10 +549,10 @@ async function onSubmitAdjustment() {
         }
 
         .workerCard {
-          background: rgba(255,255,255,0.96);
+          background: ${adminTheme.colors.panelBg};
           border-radius: 22px;
-          border: 1px solid rgba(15,23,42,0.08);
-          box-shadow: 0 16px 40px rgba(2, 6, 23, 0.12);
+          border: 1px solid ${adminTheme.colors.border};
+          box-shadow: ${adminTheme.shadow.lg};
           backdrop-filter: blur(6px);
           padding: 16px;
         }
@@ -510,7 +561,7 @@ async function onSubmitAdjustment() {
           text-align: center;
           font-size: 16px;
           font-weight: 900;
-          color: #0f172a;
+          color: ${adminTheme.colors.text};
           text-transform: capitalize;
         }
 
@@ -524,13 +575,13 @@ async function onSubmitAdjustment() {
           line-height: 1;
           font-weight: 950;
           letter-spacing: 1px;
-          color: #0b1220;
+          color: ${adminTheme.colors.text};
         }
 
         .workerMainSub {
           margin-top: 6px;
           font-size: 12px;
-          color: #64748b;
+          color: ${adminTheme.colors.textSoft};
           font-weight: 700;
         }
 
@@ -542,22 +593,22 @@ async function onSubmitAdjustment() {
           display: flex;
           justify-content: space-between;
           font-size: 12px;
-          color: #64748b;
+          color: ${adminTheme.colors.textSoft};
           font-weight: 800;
           margin-bottom: 6px;
         }
 
         .workerProgressBar {
           height: 12px;
-          border-radius: 999px;
-          background: rgba(15,23,42,0.08);
+          border-radius: ${adminTheme.radius.pill};
+          background: ${adminTheme.colors.panelAlt};
           overflow: hidden;
         }
 
         .workerProgressValue {
           height: 100%;
           width: ${Math.round(progress * 100)}%;
-          background: linear-gradient(90deg, ${brand} 0%, #6ad0c9 100%);
+          background: linear-gradient(90deg, ${adminTheme.colors.primary} 0%, ${adminTheme.colors.primarySoft} 100%);
         }
 
         .workerMainButtonWrap {
@@ -571,10 +622,12 @@ async function onSubmitAdjustment() {
           height: 220px;
           border-radius: 999px;
           border: 3px solid rgba(255,255,255,0.28);
-          background: radial-gradient(circle at 30% 25%, rgba(255,255,255,0.34), rgba(255,255,255,0) 45%), ${mainBg};
-          color: white;
+          background: radial-gradient(circle at 30% 25%, rgba(255,255,255,0.34), rgba(255,255,255,0) 45%), ${
+            isOpen ? adminTheme.colors.danger : adminTheme.colors.success
+          };
+          color: ${adminTheme.colors.textOnPrimary};
           cursor: ${isBusy || isMainBlocked ? "not-allowed" : "pointer"};
-          box-shadow: 0 16px 42px rgba(2, 6, 23, 0.22);
+          box-shadow: ${adminTheme.shadow.lg};
           display: grid;
           place-items: center;
           opacity: ${isMainBlocked ? 0.65 : 1};
@@ -601,15 +654,15 @@ async function onSubmitAdjustment() {
           border-radius: 16px;
           font-weight: 800;
           text-align: center;
-          border: 1px solid rgba(15,23,42,0.08);
-          background: rgba(15,23,42,0.04);
-          color: #0f172a;
+          border: 1px solid ${adminTheme.colors.border};
+          background: ${adminTheme.colors.panelSoft};
+          color: ${adminTheme.colors.text};
         }
 
         .workerMessage.error {
-          background: #ffeef0;
-          border-color: #ffd4da;
-          color: crimson;
+          background: ${adminTheme.colors.dangerSoft};
+          border-color: ${adminTheme.colors.danger};
+          color: ${adminTheme.colors.danger};
         }
 
         .workerTodayHead {
@@ -622,17 +675,17 @@ async function onSubmitAdjustment() {
         .workerTodayTitle {
           font-weight: 950;
           font-size: 16px;
-          color: #0f172a;
+          color: ${adminTheme.colors.text};
         }
 
         .workerTodayTotal {
           font-weight: 900;
-          color: #0f172a;
+          color: ${adminTheme.colors.text};
         }
 
         .workerMuted {
           margin-top: 10px;
-          color: #64748b;
+          color: ${adminTheme.colors.textSoft};
         }
 
         .workerEntries {
@@ -644,16 +697,16 @@ async function onSubmitAdjustment() {
         .workerEntryCard {
           border-radius: 18px;
           padding: 12px;
-          border: 1px solid rgba(15,23,42,0.08);
-          background: rgba(248,250,252,1);
-          box-shadow: 0 8px 18px rgba(2, 6, 23, 0.06);
+          border: 1px solid ${adminTheme.colors.border};
+          background: ${adminTheme.colors.panelSoft};
+          box-shadow: ${adminTheme.shadow.sm};
           display: grid;
           gap: 10px;
         }
 
         .workerEntryTitle {
           font-weight: 950;
-          color: #0f172a;
+          color: ${adminTheme.colors.text};
         }
 
         .workerEntryGrid {
@@ -663,23 +716,23 @@ async function onSubmitAdjustment() {
         }
 
         .workerEntryMini {
-          background: rgba(255,255,255,0.85);
+          background: ${adminTheme.colors.panelBg};
           border-radius: 16px;
           padding: 10px;
           text-align: center;
-          border: 1px solid rgba(15,23,42,0.06);
+          border: 1px solid ${adminTheme.colors.border};
         }
 
         .workerEntryMiniLabel {
           font-size: 11px;
-          color: #64748b;
+          color: ${adminTheme.colors.textMuted};
           font-weight: 800;
         }
 
         .workerEntryMiniValue {
           font-size: 18px;
           font-weight: 950;
-          color: #0f172a;
+          color: ${adminTheme.colors.text};
         }
 
         .workerBottomCard {
@@ -695,12 +748,12 @@ async function onSubmitAdjustment() {
 
         .workerAdjustTitle {
           font-weight: 950;
-          color: #0f172a;
+          color: ${adminTheme.colors.text};
         }
 
         .workerAdjustHelp {
           font-size: 12px;
-          color: #64748b;
+          color: ${adminTheme.colors.textSoft};
           line-height: 1.45;
           font-weight: 700;
         }
@@ -709,24 +762,29 @@ async function onSubmitAdjustment() {
           width: 100%;
           padding: 14px;
           border-radius: 16px;
-          border: 1px solid rgba(15,23,42,0.12);
+          border: 1px solid ${adminTheme.colors.border};
           font-size: 15px;
           outline: none;
-          background: rgba(248,250,252,1);
-          color: #0f172a;
+          background: ${adminTheme.colors.panelSoft};
+          color: ${adminTheme.colors.text};
+          box-sizing: border-box;
+        }
+
+        .workerAdjustInput::placeholder {
+          color: ${adminTheme.colors.textMuted};
         }
 
         .workerAdjustBtn {
           width: 100%;
           padding: 14px;
           border-radius: 16px;
-          border: none;
-          background: #0f172a;
-          color: white;
+          border: 1px solid ${adminTheme.colors.primary};
+          background: ${adminTheme.colors.primary};
+          color: ${adminTheme.colors.textOnPrimary};
           font-size: 15px;
           font-weight: 950;
           cursor: pointer;
-          box-shadow: 0 12px 26px rgba(2, 6, 23, 0.18);
+          box-shadow: ${adminTheme.shadow.sm};
         }
 
         .workerAdjustBtn:disabled {
@@ -735,14 +793,29 @@ async function onSubmitAdjustment() {
         }
 
         .workerErrorText {
-          color: crimson;
+          color: ${adminTheme.colors.danger};
           font-size: 13px;
         }
 
         .workerSuccessText {
-          color: #16a34a;
+          color: ${adminTheme.colors.success};
           font-size: 13px;
           font-weight: 900;
+        }
+
+        @media (max-width: 560px) {
+          .workerEntryGrid {
+            grid-template-columns: 1fr;
+          }
+
+          .workerMainButton {
+            width: 200px;
+            height: 200px;
+          }
+
+          .workerMainTime {
+            font-size: 46px;
+          }
         }
       `}</style>
 
@@ -901,8 +974,8 @@ async function onSubmitAdjustment() {
 
             {createAdjustment.isSuccess && (
               <div className="workerSuccessText">
-				Tu solicitud de ajuste se ha enviado correctamente. El administrador la revisará.
-			  </div>
+                Tu solicitud de ajuste se ha enviado correctamente. El administrador la revisará.
+              </div>
             )}
           </section>
         )}
@@ -910,6 +983,3 @@ async function onSubmitAdjustment() {
     </div>
   );
 }
-
-
-
