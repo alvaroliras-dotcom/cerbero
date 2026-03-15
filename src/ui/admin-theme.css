@@ -1,0 +1,82 @@
+:root {
+  /* Branding */
+  --brand-name: "Solvento";
+
+  /* Logos */
+  /* Los logos no van aquí; se seguirán controlando desde TSX */
+
+  /* Fondo general */
+  --app-bg: #f5f7fa;
+
+  /* Superficies claras */
+  --panel-bg: #ffffff;
+  --panel-soft: #f8fafc;
+  --panel-alt: #eef2f6;
+
+  /* Superficies oscuras */
+  --panel-dark: #0f2024;
+  --panel-dark-2: #0b171b;
+
+  /* Texto sobre claro */
+  --text: #1f2937;
+  --text-soft: #6b7280;
+  --text-muted: #94a3b8;
+
+  /* Texto sobre oscuro */
+  --text-on-dark: #ffffff;
+  --text-on-dark-soft: rgba(255, 255, 255, 0.78);
+  --text-on-dark-muted: rgba(255, 255, 255, 0.58);
+
+  /* Bordes */
+  --border: #e5e7eb;
+  --border-strong: #d1d5db;
+  --border-on-dark: rgba(255, 255, 255, 0.10);
+
+  /* Marca principal */
+  --primary: #4bada9;
+  --primary-hover: #3d9894;
+  --primary-soft: #ddf4f3;
+  --primary-text: #ffffff;
+
+  /* Neutros */
+  --secondary-bg: #f3f4f6;
+  --secondary-hover: #e5e7eb;
+  --secondary-text: #334155;
+
+  /* Estados */
+  --success: #16a34a;
+  --success-soft: #dcfce7;
+
+  --warning: #d97706;
+  --warning-soft: #fef3c7;
+
+  --danger: #b42318;
+  --danger-hover: #991b1b;
+  --danger-soft: #fee4e2;
+
+  --info: #0ea5e9;
+
+  /* Overlay */
+  --overlay: rgba(15, 23, 42, 0.42);
+
+  /* Radios */
+  --radius-sm: 10px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-pill: 999px;
+
+  /* Sombras */
+  --shadow-sm: 0 6px 14px rgba(15, 23, 42, 0.06);
+  --shadow-md: 0 12px 28px rgba(15, 23, 42, 0.08);
+  --shadow-lg: 0 18px 40px rgba(15, 23, 42, 0.12);
+
+  /* Layout */
+  --page-padding: 16px;
+  --section-gap: 12px;
+  --card-padding: 16px;
+  --sidebar-width: 170px;
+  --max-width: 1600px;
+  --header-height: 64px;
+  --control-height: 40px;
+}
