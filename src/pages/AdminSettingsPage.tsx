@@ -433,6 +433,29 @@ export function AdminSettingsPage() {
     setSuccess("Solicitud marcada como vista.");
   }
 
+
+async function deleteWorkerRequest(id: string) {
+  setMarkingRequestId(id);
+  setError(null);
+  setSuccess(null);
+
+  const { error: deleteError } = await supabase
+    .from("worker_requests")
+    .delete()
+    .eq("id", id);
+
+  if (deleteError) {
+    setMarkingRequestId(null);
+    setError(deleteError.message);
+    return;
+  }
+
+  setWorkerRequests((prev) => prev.filter((request) => request.id !== id));
+  setMarkingRequestId(null);
+  setSuccess("Solicitud eliminada correctamente.");
+}
+
+
   useEffect(() => {
     if (!membership?.company_id) return;
     loadSettings();
@@ -1098,24 +1121,36 @@ export function AdminSettingsPage() {
                         </span>
                       </div>
 
-                      {request.status === "pending" ? (
-                        <button
-                          type="button"
-                          className="adminSettingsBtn primary"
-                          onClick={() => markWorkerRequestAsRead(request.id)}
-                          disabled={markingRequestId === request.id}
-                        >
-                          {markingRequestId === request.id ? "Guardando..." : "Visto"}
-                        </button>
-                      ) : (
-                        <button
-                          type="button"
-                          className="adminSettingsBtn"
-                          disabled
-                        >
-                          Vista
-                        </button>
-                      )}
+						<div style={{ display: "flex", gap: 8, alignItems: "center", flexShrink: 0 }}>
+						  {request.status === "pending" ? (
+							<button
+							  type="button"
+							  className="adminSettingsBtn primary"
+							  onClick={() => markWorkerRequestAsRead(request.id)}
+							  disabled={markingRequestId === request.id}
+							>
+							  {markingRequestId === request.id ? "Guardando..." : "Visto"}
+							</button>
+						  ) : (
+							<button
+							  type="button"
+							  className="adminSettingsBtn"
+							  disabled
+							>
+							  Vista
+							</button>
+						  )}
+
+						  <button
+							type="button"
+							className="adminSettingsBtn danger"
+							onClick={() => deleteWorkerRequest(request.id)}
+							disabled={markingRequestId === request.id}
+						  >
+							{markingRequestId === request.id ? "..." : "Borrar"}
+						  </button>
+						</div>
+
                     </div>
                   );
                 })
