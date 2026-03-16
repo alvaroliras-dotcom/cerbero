@@ -6,6 +6,7 @@ import { AdminLayout } from "../ui/AdminLayout";
 import { LoginPage } from "../pages/LoginPage";
 import { WorkerPage } from "../pages/WorkerPage";
 import { WorkerHistoryPage } from "../pages/WorkerHistoryPage";
+import { WorkerGestionesPage } from "../pages/WorkerGestionesPage";
 import { PendingPage } from "../pages/PendingPage";
 
 import { AdminPage } from "../pages/AdminPage";
@@ -36,6 +37,15 @@ export const router = createBrowserRouter([
         element: (
           <RequireAuth>
             <WorkerHistoryPage />
+          </RequireAuth>
+        ),
+      },
+
+      {
+        path: "/worker/gestiones",
+        element: (
+          <RequireAuth>
+            <WorkerGestionesPage />
           </RequireAuth>
         ),
       },
