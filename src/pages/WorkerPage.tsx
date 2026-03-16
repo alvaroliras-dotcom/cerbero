@@ -140,8 +140,8 @@ function IconButton({
       title={title}
       aria-label={title}
       style={{
-        width: 64,
-        height: 64,
+        width: 72,
+        height: 72,
         borderRadius: 18,
         border: `1px solid ${adminTheme.colors.border}`,
         background: adminTheme.colors.panelSoft,
