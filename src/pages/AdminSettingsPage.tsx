@@ -34,6 +34,22 @@ type WorkerAbsenceRow = {
   created_at: string;
 };
 
+type WorkerRequestType = "vacaciones" | "dia_libre" | "otro";
+type WorkerRequestStatus = "pending" | "read";
+
+type WorkerRequestRow = {
+  id: string;
+  company_id: string;
+  user_id: string;
+  type: WorkerRequestType;
+  start_date: string;
+  end_date: string;
+  comment: string | null;
+  status: WorkerRequestStatus;
+  created_at: string;
+  read_at: string | null;
+};
+
 function pad2(n: number) {
   return String(n).padStart(2, "0");
 }
@@ -58,6 +74,19 @@ function formatAbsenceTypeLabel(type: AbsenceType) {
   }
 }
 
+function formatWorkerRequestTypeLabel(type: WorkerRequestType) {
+  switch (type) {
+    case "vacaciones":
+      return "Vacaciones";
+    case "dia_libre":
+      return "Día libre";
+    case "otro":
+      return "Otro";
+    default:
+      return type;
+  }
+}
+
 export function AdminSettingsPage() {
   const { membership, loading: membershipLoading } = useActiveMembership();
 
@@ -75,6 +104,7 @@ export function AdminSettingsPage() {
   const [holidays, setHolidays] = useState<HolidayRow[]>([]);
   const [workers, setWorkers] = useState<WorkerOption[]>([]);
   const [absences, setAbsences] = useState<WorkerAbsenceRow[]>([]);
+  const [workerRequests, setWorkerRequests] = useState<WorkerRequestRow[]>([]);
 
   const [selectedWorkerId, setSelectedWorkerId] = useState("");
   const [absenceType, setAbsenceType] = useState<AbsenceType>("vacation");
@@ -86,6 +116,7 @@ export function AdminSettingsPage() {
   const [savingCalendar, setSavingCalendar] = useState(false);
   const [savingHoliday, setSavingHoliday] = useState(false);
   const [savingAbsence, setSavingAbsence] = useState(false);
+  const [markingRequestId, setMarkingRequestId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
@@ -100,6 +131,19 @@ export function AdminSettingsPage() {
     });
   }, [absences]);
 
+  const sortedWorkerRequests = useMemo(() => {
+    return [...workerRequests].sort((a, b) => {
+      if (a.status !== b.status) {
+        return a.status === "pending" ? -1 : 1;
+      }
+      return b.created_at.localeCompare(a.created_at);
+    });
+  }, [workerRequests]);
+
+  const pendingWorkerRequestsCount = useMemo(() => {
+    return workerRequests.filter((request) => request.status === "pending").length;
+  }, [workerRequests]);
+
   const workersById = useMemo(() => {
     const map = new Map<string, WorkerOption>();
     for (const worker of workers) map.set(worker.id, worker);
@@ -113,7 +157,7 @@ export function AdminSettingsPage() {
     setError(null);
     setSuccess(null);
 
-    const [calendarRes, holidaysRes, profilesRes, absencesRes] = await Promise.all([
+    const [calendarRes, holidaysRes, profilesRes, absencesRes, requestsRes] = await Promise.all([
       supabase
         .from("company_work_calendar")
         .select(
@@ -137,6 +181,12 @@ export function AdminSettingsPage() {
         .select("id,company_id,user_id,absence_type,start_date,end_date,note,created_at")
         .eq("company_id", membership.company_id)
         .order("start_date", { ascending: true }),
+
+      supabase
+        .from("worker_requests")
+        .select("id,company_id,user_id,type,start_date,end_date,comment,status,created_at,read_at")
+        .eq("company_id", membership.company_id)
+        .order("created_at", { ascending: false }),
     ]);
 
     if (calendarRes.error) {
@@ -160,6 +210,12 @@ export function AdminSettingsPage() {
     if (absencesRes.error) {
       setLoading(false);
       setError(absencesRes.error.message);
+      return;
+    }
+
+    if (requestsRes.error) {
+      setLoading(false);
+      setError(requestsRes.error.message);
       return;
     }
 
@@ -188,6 +244,7 @@ export function AdminSettingsPage() {
 
     setHolidays((holidaysRes.data ?? []) as HolidayRow[]);
     setAbsences((absencesRes.data ?? []) as WorkerAbsenceRow[]);
+    setWorkerRequests((requestsRes.data ?? []) as WorkerRequestRow[]);
     setLoading(false);
   }
 
@@ -341,6 +398,41 @@ export function AdminSettingsPage() {
     setSuccess("Ausencia eliminada correctamente.");
   }
 
+  async function markWorkerRequestAsRead(id: string) {
+    setMarkingRequestId(id);
+    setError(null);
+    setSuccess(null);
+
+    const { error: updateError } = await supabase
+      .from("worker_requests")
+      .update({
+        status: "read",
+        read_at: new Date().toISOString(),
+      })
+      .eq("id", id);
+
+    if (updateError) {
+      setMarkingRequestId(null);
+      setError(updateError.message);
+      return;
+    }
+
+    setWorkerRequests((prev) =>
+      prev.map((request) =>
+        request.id === id
+          ? {
+              ...request,
+              status: "read",
+              read_at: new Date().toISOString(),
+            }
+          : request
+      )
+    );
+
+    setMarkingRequestId(null);
+    setSuccess("Solicitud marcada como vista.");
+  }
+
   useEffect(() => {
     if (!membership?.company_id) return;
     loadSettings();
@@ -377,7 +469,7 @@ export function AdminSettingsPage() {
 
   return (
     <div className="adminSettingsUi">
-            <style>{`
+      <style>{`
         .adminSettingsUi {
           display: grid;
           gap: 12px;
@@ -695,6 +787,46 @@ export function AdminSettingsPage() {
           border: 1px solid ${adminTheme.colors.success};
         }
 
+        .adminSettingsSectionDivider {
+          margin-top: 16px;
+          padding-top: 16px;
+          border-top: 1px solid ${adminTheme.colors.border};
+        }
+
+        .adminSettingsRequestMeta {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+          align-items: center;
+          margin-top: 2px;
+        }
+
+        .adminSettingsTag {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          min-height: 26px;
+          padding: 0 10px;
+          border-radius: 999px;
+          font-size: 12px;
+          font-weight: 800;
+          border: 1px solid ${adminTheme.colors.border};
+          background: ${adminTheme.colors.panelBg};
+          color: ${adminTheme.colors.textSoft};
+        }
+
+        .adminSettingsTag.pending {
+          background: ${adminTheme.colors.dangerSoft};
+          color: ${adminTheme.colors.danger};
+          border-color: ${adminTheme.colors.danger};
+        }
+
+        .adminSettingsTag.read {
+          background: ${adminTheme.colors.successSoft};
+          color: ${adminTheme.colors.success};
+          border-color: ${adminTheme.colors.success};
+        }
+
         @media (max-width: 1100px) {
           .adminSettingsGrid {
             grid-template-columns: 1fr;
@@ -917,6 +1049,77 @@ export function AdminSettingsPage() {
             <div className="adminSettingsSummaryItem">
               <strong>Festivos configurados</strong>
               <span>{sortedHolidays.length} festivos cargados para esta empresa.</span>
+            </div>
+
+            <div className="adminSettingsSummaryItem">
+              <strong>Solicitudes pendientes</strong>
+              <span>
+                {pendingWorkerRequestsCount === 0
+                  ? "No hay solicitudes pendientes."
+                  : `${pendingWorkerRequestsCount} solicitud${pendingWorkerRequestsCount !== 1 ? "es" : ""} pendiente${pendingWorkerRequestsCount !== 1 ? "s" : ""}.`}
+              </span>
+            </div>
+          </div>
+
+          <div className="adminSettingsSectionDivider">
+            <h3 className="adminSettingsCardTitle" style={{ fontSize: 16 }}>
+              Solicitudes de trabajadores
+            </h3>
+            <p className="adminSettingsCardSub">
+              Aquí verás vacaciones, días libres y otros avisos enviados desde la app del trabajador.
+            </p>
+
+            <div className="adminSettingsList">
+              {sortedWorkerRequests.length === 0 ? (
+                <div className="adminSettingsEmpty">Todavía no han llegado solicitudes.</div>
+              ) : (
+                sortedWorkerRequests.map((request) => {
+                  const worker = workersById.get(request.user_id);
+                  const workerName = worker?.name ?? request.user_id;
+                  const workerEmail = worker?.email ?? "";
+
+                  return (
+                    <div key={request.id} className="adminSettingsItem">
+                      <div className="adminSettingsItemMain">
+                        <strong>
+                          {workerName} · {formatWorkerRequestTypeLabel(request.type)}
+                        </strong>
+
+                        <div className="adminSettingsRequestMeta">
+                          <span className={`adminSettingsTag ${request.status}`}>
+                            {request.status === "pending" ? "Pendiente" : "Vista"}
+                          </span>
+                        </div>
+
+                        <span>
+                          {request.start_date} → {request.end_date}
+                          {workerEmail ? ` · ${workerEmail}` : ""}
+                          {request.comment ? ` · ${request.comment}` : ""}
+                        </span>
+                      </div>
+
+                      {request.status === "pending" ? (
+                        <button
+                          type="button"
+                          className="adminSettingsBtn primary"
+                          onClick={() => markWorkerRequestAsRead(request.id)}
+                          disabled={markingRequestId === request.id}
+                        >
+                          {markingRequestId === request.id ? "Guardando..." : "Visto"}
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          className="adminSettingsBtn"
+                          disabled
+                        >
+                          Vista
+                        </button>
+                      )}
+                    </div>
+                  );
+                })
+              )}
             </div>
           </div>
         </aside>
