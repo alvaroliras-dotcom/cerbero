@@ -140,8 +140,8 @@ function IconButton({
       title={title}
       aria-label={title}
       style={{
-        width: 72,
-        height: 72,
+        width: 64,
+        height: 64,
         borderRadius: 18,
         border: `1px solid ${adminTheme.colors.border}`,
         background: adminTheme.colors.panelSoft,
@@ -638,8 +638,8 @@ export function WorkerPage() {
         }
 
         .workerMainButton {
-          width: 176px;
-          height: 176px;
+          width: 184px;
+          height: 184px;
           border-radius: 999px;
           border: 3px solid rgba(255,255,255,0.28);
           background: radial-gradient(circle at 30% 25%, rgba(255,255,255,0.34), rgba(255,255,255,0) 45%), ${
@@ -856,13 +856,13 @@ export function WorkerPage() {
           }
 
           .workerMainButton {
-            width: 152px;
-            height: 152px;
+            width: 160px;
+            height: 160px;
           }
 
           .workerMainButtonInner svg {
-            width: 52px;
-            height: 52px;
+            width: 56px;
+            height: 56px;
           }
 
           .workerMainButtonLabel {
