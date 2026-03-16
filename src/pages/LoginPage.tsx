@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 import { supabase } from "../lib/supabaseClient";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { adminTheme } from "../ui/adminTheme";
 
 import CerberoLogo from "../assets/LOGOTIPO-CERBERO.svg";
@@ -8,35 +8,25 @@ import SolventoLogo from "../assets/LOGOTIPO-SOLVENTO-COLOR.svg";
 
 export function LoginPage() {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
 
-  const emailFromLink = useMemo(
-    () => (searchParams.get("u") ?? "").trim(),
-    [searchParams]
-  );
-
-  const [email, setEmail] = useState(emailFromLink);
+  const [email, setEmail] = useState("");
   const [pin, setPin] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    setEmail(emailFromLink);
-  }, [emailFromLink]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
 
-    const cleanEmail = (email ?? "").trim();
-    const cleanPin = (pin ?? "").trim();
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanPin = pin.trim();
 
     if (!cleanEmail) {
-      setError("Falta el enlace de acceso. Pide al administrador que te lo reenvíe.");
+      setError("Introduce tu correo electrónico.");
       return;
     }
 
-    if (cleanPin.length < 4) {
+    if (!cleanPin || cleanPin.length < 4) {
       setError("PIN inválido.");
       return;
     }
@@ -50,13 +40,18 @@ export function LoginPage() {
 
     if (error) {
       setLoading(false);
-      setError("PIN incorrecto.");
+      setError("Correo o PIN incorrectos.");
       return;
     }
 
-    const { data: memberships } = await supabase.rpc("my_memberships");
+    const { data: memberships, error: membershipsError } = await supabase.rpc("my_memberships");
 
     setLoading(false);
+
+    if (membershipsError) {
+      setError("No se pudo cargar tu acceso.");
+      return;
+    }
 
     if (!memberships || memberships.length === 0) {
       navigate("/pending", { replace: true });
@@ -118,21 +113,34 @@ export function LoginPage() {
             fontWeight: 600,
           }}
         >
-          {email ? (
-            <>
-              Acceso para <strong style={{ color: adminTheme.colors.text }}>{email}</strong>
-            </>
-          ) : (
-            "Acceso de trabajador"
-          )}
+          Acceso con correo y PIN
         </div>
 
         <form onSubmit={handleSubmit} style={{ display: "grid", gap: 12 }}>
-          <input type="hidden" value={email} readOnly />
+          <input
+            type="email"
+            autoComplete="email"
+            placeholder="Correo electrónico"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            style={{
+              padding: 16,
+              fontSize: 16,
+              borderRadius: 12,
+              border: `1px solid ${adminTheme.colors.border}`,
+              outline: "none",
+              textAlign: "left",
+              background: adminTheme.colors.panelSoft,
+              color: adminTheme.colors.text,
+              fontWeight: 700,
+              boxSizing: "border-box",
+            }}
+          />
 
           <input
+            type="password"
             inputMode="numeric"
-            autoComplete="one-time-code"
+            autoComplete="current-password"
             placeholder="PIN"
             value={pin}
             onChange={(e) => setPin(e.target.value)}
@@ -192,7 +200,7 @@ export function LoginPage() {
             color: adminTheme.colors.textMuted,
           }}
         >
-          Si no tienes el enlace, pide a tu responsable que te lo reenvíe.
+          Introduce tu correo corporativo y el PIN facilitado por administración.
         </div>
 
         <div
