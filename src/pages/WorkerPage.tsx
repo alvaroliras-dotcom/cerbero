@@ -553,7 +553,7 @@ export function WorkerPage() {
         background: `linear-gradient(180deg, ${adminTheme.colors.primary} 0%, ${adminTheme.colors.primarySoft} 100%)`,
         display: "flex",
         justifyContent: "center",
-        padding: 14,
+        padding: 10,
       }}
     >
       <style>{`
@@ -565,7 +565,7 @@ export function WorkerPage() {
           width: 100%;
           max-width: 520px;
           display: grid;
-          gap: 12px;
+          gap: 10px;
         }
 
         .workerCard {
@@ -574,12 +574,12 @@ export function WorkerPage() {
           border: 1px solid ${adminTheme.colors.border};
           box-shadow: ${adminTheme.shadow.lg};
           backdrop-filter: blur(6px);
-          padding: 16px;
+          padding: 14px;
         }
 
         .workerDate {
           text-align: center;
-          font-size: 16px;
+          font-size: 15px;
           font-weight: 900;
           color: ${adminTheme.colors.text};
           text-transform: capitalize;
@@ -587,11 +587,11 @@ export function WorkerPage() {
 
         .workerMainTimeWrap {
           text-align: center;
-          margin-top: 10px;
+          margin-top: 6px;
         }
 
         .workerMainTime {
-          font-size: 54px;
+          font-size: 44px;
           line-height: 1;
           font-weight: 950;
           letter-spacing: 1px;
@@ -599,27 +599,27 @@ export function WorkerPage() {
         }
 
         .workerMainSub {
-          margin-top: 6px;
+          margin-top: 4px;
           font-size: 12px;
           color: ${adminTheme.colors.textSoft};
           font-weight: 700;
         }
 
         .workerProgressWrap {
-          margin-top: 12px;
+          margin-top: 10px;
         }
 
         .workerProgressLabels {
           display: flex;
           justify-content: space-between;
-          font-size: 12px;
+          font-size: 11px;
           color: ${adminTheme.colors.textSoft};
           font-weight: 800;
-          margin-bottom: 6px;
+          margin-bottom: 5px;
         }
 
         .workerProgressBar {
-          height: 12px;
+          height: 10px;
           border-radius: ${adminTheme.radius.pill};
           background: ${adminTheme.colors.panelAlt};
           overflow: hidden;
@@ -632,14 +632,14 @@ export function WorkerPage() {
         }
 
         .workerMainButtonWrap {
-          margin-top: 16px;
+          margin-top: 12px;
           display: flex;
           justify-content: center;
         }
 
         .workerMainButton {
-          width: 220px;
-          height: 220px;
+          width: 176px;
+          height: 176px;
           border-radius: 999px;
           border: 3px solid rgba(255,255,255,0.28);
           background: radial-gradient(circle at 30% 25%, rgba(255,255,255,0.34), rgba(255,255,255,0) 45%), ${
@@ -658,20 +658,25 @@ export function WorkerPage() {
         .workerMainButtonInner {
           display: grid;
           place-items: center;
-          gap: 10px;
+          gap: 8px;
+        }
+
+        .workerMainButtonInner svg {
+          width: 60px;
+          height: 60px;
         }
 
         .workerMainButtonLabel {
-          font-size: 24px;
+          font-size: 20px;
           font-weight: 950;
           letter-spacing: 1px;
           text-shadow: 0 8px 18px rgba(0,0,0,0.22);
         }
 
         .workerMessage {
-          margin-top: 14px;
-          padding: 12px;
-          border-radius: 16px;
+          margin-top: 12px;
+          padding: 10px;
+          border-radius: 14px;
           font-weight: 800;
           text-align: center;
           border: 1px solid ${adminTheme.colors.border};
@@ -694,39 +699,42 @@ export function WorkerPage() {
 
         .workerTodayTitle {
           font-weight: 950;
-          font-size: 16px;
+          font-size: 15px;
           color: ${adminTheme.colors.text};
         }
 
         .workerTodayTotal {
           font-weight: 900;
           color: ${adminTheme.colors.text};
+          font-size: 14px;
         }
 
         .workerMuted {
-          margin-top: 10px;
+          margin-top: 8px;
           color: ${adminTheme.colors.textSoft};
+          font-size: 13px;
         }
 
         .workerEntries {
-          margin-top: 12px;
+          margin-top: 10px;
           display: grid;
-          gap: 10px;
+          gap: 8px;
         }
 
         .workerEntryCard {
           border-radius: 18px;
-          padding: 12px;
+          padding: 10px;
           border: 1px solid ${adminTheme.colors.border};
           background: ${adminTheme.colors.panelSoft};
           box-shadow: ${adminTheme.shadow.sm};
           display: grid;
-          gap: 10px;
+          gap: 8px;
         }
 
         .workerEntryTitle {
           font-weight: 950;
           color: ${adminTheme.colors.text};
+          font-size: 15px;
         }
 
         .workerEntryGrid {
@@ -738,9 +746,10 @@ export function WorkerPage() {
         .workerEntryMini {
           background: ${adminTheme.colors.panelBg};
           border-radius: 16px;
-          padding: 10px;
+          padding: 10px 8px;
           text-align: center;
           border: 1px solid ${adminTheme.colors.border};
+          min-width: 0;
         }
 
         .workerEntryMiniLabel {
@@ -750,16 +759,21 @@ export function WorkerPage() {
         }
 
         .workerEntryMiniValue {
-          font-size: 18px;
+          font-size: 16px;
           font-weight: 950;
           color: ${adminTheme.colors.text};
+          line-height: 1.1;
+          margin-top: 2px;
+          word-break: break-word;
         }
 
         .workerBottomCard {
           display: flex;
-          justify-content: space-around;
+          justify-content: space-between;
           align-items: center;
           gap: 8px;
+          padding-top: 12px;
+          padding-bottom: 12px;
         }
 
         .workerAdjustCard {
@@ -825,21 +839,67 @@ export function WorkerPage() {
         }
 
         @media (max-width: 560px) {
-          .workerEntryGrid {
-            grid-template-columns: 1fr;
+          .workerPageUi {
+            padding: 8px;
           }
 
-          .workerMainButton {
-            width: 200px;
-            height: 200px;
+          .workerShell {
+            gap: 8px;
+          }
+
+          .workerCard {
+            padding: 12px;
           }
 
           .workerMainTime {
-            font-size: 46px;
+            font-size: 38px;
+          }
+
+          .workerMainButton {
+            width: 152px;
+            height: 152px;
+          }
+
+          .workerMainButtonInner svg {
+            width: 52px;
+            height: 52px;
+          }
+
+          .workerMainButtonLabel {
+            font-size: 17px;
+          }
+
+          .workerEntryGrid {
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 6px;
+          }
+
+          .workerEntryMini {
+            padding: 8px 6px;
+            border-radius: 14px;
+          }
+
+          .workerEntryMiniLabel {
+            font-size: 10px;
+          }
+
+          .workerEntryMiniValue {
+            font-size: 14px;
           }
 
           .workerBottomCard {
-            justify-content: space-between;
+            gap: 6px;
+          }
+
+          .workerBottomCard button {
+            width: 56px !important;
+            height: 56px !important;
+            border-radius: 16px !important;
+          }
+
+          .workerBottomCard button svg {
+            width: 24px;
+            height: 24px;
           }
         }
       `}</style>
