@@ -22,8 +22,11 @@ export async function requestPushPermissionAndToken() {
     throw new Error("Permiso de notificaciones denegado.");
   }
 
+  const registration = await navigator.serviceWorker.ready;
+
   const token = await getToken(messaging, {
     vapidKey,
+    serviceWorkerRegistration: registration,
   });
 
   if (!token) {
