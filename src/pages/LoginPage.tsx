@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import { adminTheme } from "../ui/adminTheme";
 
 import CerberoLogo from "../assets/LOGOTIPO-CERBERO.svg";
-import SolventoLogo from "../assets/LOGOTIPO-SOLVENTO-COLOR.svg";
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -94,7 +93,7 @@ export function LoginPage() {
       >
         <div style={{ textAlign: "center" }}>
           <img
-            src={SolventoLogo}
+            src={CerberoLogo}
             alt="Solvento"
             style={{
               height: 92,

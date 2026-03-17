@@ -821,235 +821,220 @@ export function AdminPage() {
   // PARTE 6/6 — UI PROPIA DE LA PÁGINA
   // ======================================================
 
-  return (
-    <div className="adminPageUi">
-      <style>{`
-  .adminPageUi {
-    display: grid;
-    gap: 12px;
-  }
+return (
+  <div className="adminPageUi">
+    <style>{`
+      .adminPageUi {
+        display: grid;
+        gap: 12px;
+      }
 
-  .adminFilters {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    align-items: center;
-  }
+      .adminFilters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+      }
 
-  .adminPill {
-    height: 40px;
-    padding: 0 14px;
-    border: 1px solid ${adminTheme.colors.border};
-    border-radius: 12px;
-    background: ${adminTheme.colors.panelSoft};
-    color: ${adminTheme.colors.text};
-    font-weight: 700;
-    cursor: pointer;
-  }
+      .adminPill {
+        height: 40px;
+        padding: 0 14px;
+        border: 1px solid ${adminTheme.colors.border};
+        border-radius: 12px;
+        background: ${adminTheme.colors.panelSoft};
+        color: ${adminTheme.colors.text};
+        font-weight: 700;
+        cursor: pointer;
+      }
 
-  .adminPill.active {
-    background: ${adminTheme.colors.primarySoft};
-    border-color: ${adminTheme.colors.primary};
-    color: ${adminTheme.colors.primary};
-  }
+      .adminPill.active {
+        background: ${adminTheme.colors.primarySoft};
+        border-color: ${adminTheme.colors.primary};
+        color: ${adminTheme.colors.primary};
+      }
 
-  .adminField {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    height: 40px;
-    padding: 0 12px;
-    border: 1px solid ${adminTheme.colors.border};
-    border-radius: 12px;
-    background: ${adminTheme.colors.panelBg};
-  }
+      .adminField {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        height: 40px;
+        padding: 0 12px;
+        border: 1px solid ${adminTheme.colors.border};
+        border-radius: 12px;
+        background: ${adminTheme.colors.panelBg};
+      }
 
-  .adminField label {
-    font-size: 12px;
-    color: ${adminTheme.colors.textSoft};
-    font-weight: 700;
-  }
+      .adminField label {
+        font-size: 12px;
+        color: ${adminTheme.colors.textSoft};
+        font-weight: 700;
+      }
 
-  .adminField input {
-    background: transparent;
-    border: none;
-    outline: none;
-    color: ${adminTheme.colors.text};
-    font-weight: 700;
-  }
+      .adminField input {
+        background: transparent;
+        border: none;
+        outline: none;
+        color: ${adminTheme.colors.text};
+        font-weight: 700;
+      }
 
-  .adminBtn {
-    height: 40px;
-    padding: 0 16px;
-    border: 1px solid ${adminTheme.colors.border};
-    border-radius: 12px;
-    background: ${adminTheme.colors.panelSoft};
-    color: ${adminTheme.colors.text};
-    font-weight: 700;
-    cursor: pointer;
-  }
+      .adminBtn {
+        height: 40px;
+        padding: 0 16px;
+        border: 1px solid ${adminTheme.colors.border};
+        border-radius: 12px;
+        background: ${adminTheme.colors.panelSoft};
+        color: ${adminTheme.colors.text};
+        font-weight: 700;
+        cursor: pointer;
+      }
 
-  .adminBtn.primary {
-    background: ${adminTheme.colors.primary};
-    color: ${adminTheme.colors.textOnPrimary};
-    border-color: ${adminTheme.colors.primary};
-  }
+      .adminBtn.primary {
+        background: ${adminTheme.colors.primary};
+        color: ${adminTheme.colors.textOnPrimary};
+        border-color: ${adminTheme.colors.primary};
+      }
 
-  .adminBtn.danger {
-    background: ${adminTheme.colors.danger};
-    color: white;
-    border-color: ${adminTheme.colors.dangerHover};
-  }
+      .adminBtn.danger {
+        background: ${adminTheme.colors.danger};
+        color: white;
+        border-color: ${adminTheme.colors.dangerHover};
+      }
 
-  .adminBadge {
-    height: 40px;
-    padding: 0 14px;
-    display: inline-flex;
-    align-items: center;
-    border: 1px solid ${adminTheme.colors.border};
-    border-radius: 12px;
-    background: ${adminTheme.colors.panelBg};
-    color: ${adminTheme.colors.textSoft};
-    font-size: 13px;
-    font-weight: 700;
-  }
+      .adminBadge {
+        height: 40px;
+        padding: 0 14px;
+        display: inline-flex;
+        align-items: center;
+        border: 1px solid ${adminTheme.colors.border};
+        border-radius: 12px;
+        background: ${adminTheme.colors.panelBg};
+        color: ${adminTheme.colors.textSoft};
+        font-size: 13px;
+        font-weight: 700;
+      }
 
-  .adminKpiGrid {
-    display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 12px;
-  }
+      .adminKpiGrid {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 12px;
+      }
 
-  .adminKpi {
-    border: 1px solid rgba(255,255,255,.08);
-    border-radius: 18px;
-    background: #0f2024;
-    padding: 16px;
-  }
+      .adminKpi {
+        border: 1px solid ${adminTheme.colors.border};
+        border-radius: 18px;
+        background: ${adminTheme.colors.panelBg};
+        padding: 16px;
+      }
 
-  .adminKpiLabel {
-    font-size: 13px;
-    font-weight: 700;
-    color: rgba(255,255,255,.78);
-  }
+      .adminKpiLabel {
+        font-size: 13px;
+        font-weight: 700;
+        color: ${adminTheme.colors.textSoft};
+      }
 
-  .adminKpiValue {
-    margin-top: 8px;
-    font-size: 26px;
-    font-weight: 800;
-    color: #ffffff;
-  }
+      .adminKpiValue {
+        margin-top: 8px;
+        font-size: 26px;
+        font-weight: 800;
+        color: ${adminTheme.colors.text};
+      }
 
-  .adminGrid {
-    display: grid;
-    grid-template-columns: 1.55fr 1fr;
-    gap: 12px;
-    align-items: start;
-  }
+      .adminGrid {
+        display: grid;
+        grid-template-columns: 1.55fr 1fr;
+        gap: 12px;
+        align-items: start;
+      }
 
-  .adminCol {
-    display: grid;
-    gap: 12px;
-  }
+      .adminCol {
+        display: grid;
+        gap: 12px;
+      }
 
-  .adminCard {
-    border: 1px solid rgba(255,255,255,.08);
-    border-radius: 18px;
-    background: #0f2024;
-    padding: 16px;
-  }
+      .adminCard {
+        border: 1px solid ${adminTheme.colors.border};
+        border-radius: 18px;
+        background: ${adminTheme.colors.panelBg};
+        padding: 16px;
+      }
 
-  .adminCardTitle {
-    margin: 0;
-    font-size: 18px;
-    font-weight: 800;
-    color: #ffffff;
-  }
+      .adminCardTitle {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 800;
+        color: ${adminTheme.colors.text};
+      }
 
-  .adminCardSub {
-    margin: 4px 0 0 0;
-    font-size: 13px;
-    font-weight: 600;
-    color: rgba(255,255,255,.78);
-  }
+      .adminCardSub {
+        margin: 4px 0 0 0;
+        font-size: 13px;
+        font-weight: 600;
+        color: ${adminTheme.colors.textSoft};
+      }
 
-  .adminNotice {
-    margin-top: 12px;
-    padding: 12px;
-    border-radius: 12px;
-    background: #3b1014;
-    color: #ffd7d7;
-    border: 1px solid #7f1d1d;
-    font-weight: 700;
-  }
+      .adminNotice {
+        margin-top: 12px;
+        padding: 12px;
+        border-radius: 12px;
+        background: ${adminTheme.colors.dangerSoft};
+        color: ${adminTheme.colors.danger};
+        border: 1px solid ${adminTheme.colors.danger};
+        font-weight: 700;
+      }
 
-  .adminTableWrap {
-    margin-top: 12px;
-    overflow: auto;
-    border: 1px solid rgba(255,255,255,.08);
-    border-radius: 14px;
-    background: #0b171b;
-  }
+      .adminTableWrap {
+        margin-top: 12px;
+        overflow: auto;
+        border: 1px solid ${adminTheme.colors.border};
+        border-radius: 14px;
+        background: ${adminTheme.colors.panelSoft};
+      }
 
-  .adminTable {
-    width: 100%;
-    border-collapse: collapse;
-  }
+      .adminTable {
+        width: 100%;
+        border-collapse: collapse;
+      }
 
-  .adminTable th,
-  .adminTable td {
-    padding: 12px;
-    text-align: left;
-    border-bottom: 1px solid rgba(255,255,255,.10);
-    font-size: 14px;
-    color: #f8fafc;
-  }
+      .adminTable th,
+      .adminTable td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid ${adminTheme.colors.border};
+        font-size: 14px;
+        color: ${adminTheme.colors.text};
+      }
 
-  .adminTable th {
-    color: rgba(255,255,255,.82);
-    font-weight: 800;
-  }
+      .adminTable th {
+        color: ${adminTheme.colors.textSoft};
+        font-weight: 800;
+      }
 
-  .adminRight {
-    text-align: right;
-  }
+      .adminInput {
+        flex: 1;
+        min-width: 220px;
+        height: 40px;
+        padding: 0 12px;
+        border: 1px solid ${adminTheme.colors.border};
+        border-radius: 12px;
+        background: ${adminTheme.colors.panelSoft};
+        color: ${adminTheme.colors.text};
+        outline: none;
+        font-weight: 700;
+      }
 
-  .adminSearchRow,
-  .adminResolveRow {
-    margin-top: 12px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    align-items: center;
-  }
+      @media (max-width: 1200px) {
+        .adminKpiGrid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
 
-  .adminInput {
-    flex: 1;
-    min-width: 220px;
-    height: 40px;
-    padding: 0 12px;
-    border: 1px solid rgba(255,255,255,.10);
-    border-radius: 12px;
-    background: #0b171b;
-    color: #ffffff;
-    outline: none;
-    font-weight: 700;
-  }
+        .adminGrid {
+          grid-template-columns: 1fr;
+        }
+      }
+    `}</style>
 
-  .adminInput::placeholder {
-    color: rgba(255,255,255,.55);
-  }
-
-  @media (max-width: 1200px) {
-    .adminKpiGrid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .adminGrid {
-      grid-template-columns: 1fr;
-    }
-  }
-`}</style>
+    {/* TODO tu JSX inferior exactamente igual, sin tocarlo */}
 
       <section className="adminFilters">
         <button

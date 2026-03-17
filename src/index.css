@@ -1,19 +1,19 @@
 /* === BASE CSS (estable, sin UI kit) === */
 
 :root{
-  --bg: #0b1020;
-  --text: rgba(255,255,255,.92);
-  --muted: rgba(255,255,255,.70);
-  --border: rgba(255,255,255,.12);
-  --card: rgba(255,255,255,.06);
-  --card2: rgba(255,255,255,.08);
-  --primary: #3b82f6;
+  --bg: #ffffff;
+  --text: #111111;
+  --muted: #666666;
+  --border: #d9d9d9;
+  --card: #ffffff;
+  --card2: #f8f8f8;
+  --primary: #E0007A;
   --danger: #ef4444;
   --radius: 14px;
   --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
 
-  /* Branding (Solvento) */
-  --brand: #4bada9;
+  /* Branding (Cerbero Demo) */
+  --brand: #E0007A;
 }
 
 *{ box-sizing: border-box; }
@@ -21,23 +21,19 @@
 html, body, #root{ height: 100%; }
 
 body{
-  margin:0;
+  margin: 0;
   font-family: var(--font);
-
-  /* ✅ Importante: el body NO debe pintar el azul global,
-     porque entonces se ve detrás del login. */
   background: #ffffff;
-
   color: var(--text);
 }
 
-/* ✅ Root ocupa toda la pantalla */
+/* Root ocupa toda la pantalla */
 #root{
   width: 100%;
   min-height: 100vh;
 }
 
-/* IMPORTANTE: mata cualquier blanco colado por wrappers */
+/* Mata cualquier fondo colado por wrappers */
 #root, main{
   background: transparent !important;
   min-height: 100vh;
@@ -59,16 +55,16 @@ a{ color: inherit; }
 .loginPage{
   min-height: 100vh;
   width: 100%;
-  background: linear-gradient(180deg, var(--brand) 0%, #cfeeed 60%, #ffffff 100%);
+  background: linear-gradient(180deg, #E0007A 0%, #FCE4F1 58%, #ffffff 100%);
 }
 
 /* =========================
-   FONDO AZUL PARA "LA APP"
+   FONDO GENERAL PARA LA APP
    (Admin / Worker), NO para login
    ========================= */
 
 .appShell{
   min-height: 100vh;
   width: 100%;
-  background: radial-gradient(1200px 900px at 20% 0%, #132a65 0%, #0b1020 55%, #050814 100%);
+  background: linear-gradient(180deg, #F5F5F5 0%, #FCE4F1 100%);
 }
