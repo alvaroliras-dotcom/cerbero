@@ -14,6 +14,8 @@ export function useRegisterPushDevice(enabled: boolean = true) {
     if (membershipLoading) return;
     if (!membership?.company_id) return;
 
+    const companyId = membership.company_id;
+
     let cancelled = false;
     startedRef.current = true;
 
@@ -29,7 +31,7 @@ export function useRegisterPushDevice(enabled: boolean = true) {
         if (cancelled) return;
 
         await savePushDevice({
-          companyId: membership.company_id,
+          companyId,
           userId: authData.user.id,
           deviceToken: token,
         });
