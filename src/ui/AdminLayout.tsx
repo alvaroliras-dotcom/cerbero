@@ -176,7 +176,7 @@ export function AdminLayout() {
       <style>{`
         .cerbAdmRoot {
           min-height: 100vh;
-          background: ${adminTheme.colors.appBg};
+          background: linear-gradient(180deg, ${adminTheme.colors.appBg} 0%, ${adminTheme.colors.panelSoft} 100%);
           color: ${adminTheme.colors.text};
           padding: ${adminTheme.layout.pagePadding};
         }
@@ -197,13 +197,13 @@ export function AdminLayout() {
         .cerbAdmSidebar {
           min-height: calc(100vh - 32px);
           border: 1px solid ${adminTheme.colors.border};
-          border-radius: 18px;
-          background: ${adminTheme.colors.panelBg};
+          border-radius: 22px;
+          background: linear-gradient(180deg, ${adminTheme.colors.panelBg} 0%, ${adminTheme.colors.panelSoft} 100%);
           padding: 14px;
           display: flex;
           flex-direction: column;
           gap: 12px;
-          box-shadow: ${adminTheme.shadow.sm};
+          box-shadow: ${adminTheme.shadow.md};
         }
 
         .cerbAdmNavBtn {
@@ -211,25 +211,27 @@ export function AdminLayout() {
           height: 56px;
           border: 1px solid ${adminTheme.colors.border};
           border-radius: 14px;
-          background: ${adminTheme.colors.panelSoft};
+          background: ${adminTheme.colors.panelBg};
           color: ${adminTheme.colors.textSoft};
           display: flex;
           align-items: center;
           justify-content: center;
           cursor: pointer;
           flex: 0 0 auto;
-          transition: background .18s ease, border-color .18s ease, color .18s ease;
+          transition: background .18s ease, border-color .18s ease, color .18s ease, transform .18s ease;
         }
 
         .cerbAdmNavBtn:hover {
           background: ${adminTheme.colors.panelAlt};
           color: ${adminTheme.colors.text};
+          transform: translateY(-1px);
         }
 
         .cerbAdmNavBtn.isActive {
           background: ${adminTheme.colors.primarySoft};
           border-color: ${adminTheme.colors.primary};
           color: ${adminTheme.colors.primary};
+          box-shadow: inset 0 0 0 1px ${adminTheme.colors.primary};
         }
 
         .cerbAdmSidebarSpacer {
@@ -242,7 +244,7 @@ export function AdminLayout() {
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 8px;
+          gap: 10px;
           flex: 0 0 auto;
         }
 
@@ -251,12 +253,19 @@ export function AdminLayout() {
           max-width: 100%;
           height: auto;
           display: block;
+          filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.08));
         }
 
         .cerbAdmVersion {
           font-size: 11px;
-          color: ${adminTheme.colors.textMuted};
-          font-weight: 700;
+          color: ${adminTheme.colors.primary};
+          font-weight: 900;
+          letter-spacing: 1.2px;
+          text-transform: uppercase;
+          padding: 4px 10px;
+          border-radius: 999px;
+          background: ${adminTheme.colors.primarySoft};
+          border: 1px solid rgba(224, 7, 122, 0.22);
         }
 
         .cerbAdmMain {
@@ -272,15 +281,15 @@ export function AdminLayout() {
           max-height: ${adminTheme.layout.headerHeight};
           overflow: hidden;
           border: 1px solid ${adminTheme.colors.border};
-          border-radius: 18px;
-          background: ${adminTheme.colors.panelBg};
+          border-radius: 22px;
+          background: linear-gradient(90deg, ${adminTheme.colors.panelBg} 0%, ${adminTheme.colors.panelSoft} 100%);
           padding: 8px 18px;
           display: flex;
           align-items: center;
           justify-content: space-between;
           gap: 16px;
           flex: 0 0 auto;
-          box-shadow: ${adminTheme.shadow.sm};
+          box-shadow: ${adminTheme.shadow.md};
         }
 
         .cerbAdmHeaderText {
@@ -295,7 +304,7 @@ export function AdminLayout() {
           margin: 0;
           font-size: 18px;
           line-height: 1;
-          font-weight: 800;
+          font-weight: 900;
           color: ${adminTheme.colors.text};
           white-space: nowrap;
           overflow: hidden;
@@ -307,7 +316,7 @@ export function AdminLayout() {
           font-size: 11px;
           line-height: 1;
           color: ${adminTheme.colors.textSoft};
-          font-weight: 600;
+          font-weight: 700;
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
@@ -319,6 +328,7 @@ export function AdminLayout() {
           justify-content: flex-end;
           flex: 0 0 auto;
           height: 100%;
+          min-width: 150px;
         }
 
         .cerbAdmSolventoLogo {
@@ -327,6 +337,7 @@ export function AdminLayout() {
           width: auto;
           display: block;
           object-fit: contain;
+          filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.10));
         }
 
         .cerbAdmBody {
@@ -405,10 +416,10 @@ export function AdminLayout() {
           <div className="cerbAdmSidebarBrand">
             <img
               className="cerbAdmCerberoLogo"
-              src={adminTheme.logos.secondary}
+              src={adminTheme.logos.main}
               alt="Cerbero"
             />
-            <div className="cerbAdmVersion">v1.0</div>
+            <div className="cerbAdmVersion">DEMO</div>
           </div>
         </aside>
 
@@ -423,7 +434,7 @@ export function AdminLayout() {
               <img
                 className="cerbAdmSolventoLogo"
                 src={adminTheme.logos.main}
-                alt={adminTheme.brandName}
+                alt="Cerbero Demo"
               />
             </div>
           </header>

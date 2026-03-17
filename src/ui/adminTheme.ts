@@ -1,38 +1,37 @@
 import CerberoLogo from "../assets/LOGOTIPO-CERBERO.svg";
-import SolventoLogo from "../assets/LOGOTIPO-SOLVENTO-COLOR.svg";
 
 export const adminTheme = {
-  brandName: "Solvento",
+  brandName: "Cerbero Demo",
 
   logos: {
-    main: SolventoLogo,
+    main: CerberoLogo,
     secondary: CerberoLogo,
   },
 
   colors: {
-    appBg: "#F5F7FA",
-    pageBg: "#F5F7FA",
+    appBg: "#F5F5F5",
+    pageBg: "#F5F5F5",
 
     panelBg: "#FFFFFF",
     cardBg: "#FFFFFF",
-    panelSoft: "#F8FAFC",
-    panelAlt: "#EEF2F6",
+    panelSoft: "#F8F8F8",
+    panelAlt: "#EFEFEF",
 
-    text: "#1F2937",
-    textSoft: "#6B7280",
-    textMuted: "#94A3B8",
+    text: "#111111",
+    textSoft: "#555555",
+    textMuted: "#888888",
     textOnPrimary: "#FFFFFF",
 
-    border: "#E5E7EB",
-    borderStrong: "#D1D5DB",
+    border: "#D9D9D9",
+    borderStrong: "#BFBFBF",
 
-    primary: "#4BADA9",
-    primaryHover: "#3D9894",
-    primarySoft: "#DDF4F3",
-    primaryBorder: "#3D9894",
+    primary: "#E0007A",
+    primaryHover: "#C00068",
+    primarySoft: "#FCE4F1",
+    primaryBorder: "#C00068",
 
-    secondaryBg: "#F3F4F6",
-    secondaryHover: "#E5E7EB",
+    secondaryBg: "#F2F2F2",
+    secondaryHover: "#E5E5E5",
 
     success: "#16A34A",
     successSoft: "#DCFCE7",
@@ -45,8 +44,8 @@ export const adminTheme = {
     dangerSoft: "#FEE4E2",
 
     info: "#0EA5E9",
-    link: "#3D9894",
-    overlay: "rgba(15, 23, 42, 0.42)",
+    link: "#E0007A",
+    overlay: "rgba(0, 0, 0, 0.35)",
   },
 
   radius: {
@@ -58,15 +57,15 @@ export const adminTheme = {
   },
 
   shadow: {
-    sm: "0 6px 14px rgba(15, 23, 42, 0.06)",
-    md: "0 12px 28px rgba(15, 23, 42, 0.08)",
-    lg: "0 18px 40px rgba(15, 23, 42, 0.12)",
+    sm: "0 6px 14px rgba(0, 0, 0, 0.06)",
+    md: "0 12px 28px rgba(0, 0, 0, 0.08)",
+    lg: "0 18px 40px rgba(0, 0, 0, 0.12)",
   },
 
   shadows: {
-    sm: "0 6px 14px rgba(15, 23, 42, 0.06)",
-    md: "0 12px 28px rgba(15, 23, 42, 0.08)",
-    lg: "0 18px 40px rgba(15, 23, 42, 0.12)",
+    sm: "0 6px 14px rgba(0, 0, 0, 0.06)",
+    md: "0 12px 28px rgba(0, 0, 0, 0.08)",
+    lg: "0 18px 40px rgba(0, 0, 0, 0.12)",
   },
 
   layout: {
