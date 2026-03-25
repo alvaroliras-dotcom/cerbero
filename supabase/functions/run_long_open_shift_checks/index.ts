@@ -1,150 +1,205 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
+type CalendarRow = {
+  company_id: string;
+  morning_start: string | null;
+  lunch_start: string | null;
+  afternoon_start: string | null;
+  day_end: string | null;
+};
+
+type MembershipRow = {
+  user_id: string;
+  company_id: string;
+  role: string;
+};
+
+type TimeEntryRow = {
+  id: string;
+  check_in_at: string | null;
+  check_out_at: string | null;
+};
+
+function getMadridNowParts() {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Europe/Madrid",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hourCycle: "h23",
+  }).formatToParts(new Date());
+
+  const map = Object.fromEntries(parts.map((p) => [p.type, p.value]));
+
+  return {
+    year: Number(map.year),
+    month: Number(map.month),
+    day: Number(map.day),
+    hour: Number(map.hour),
+    minute: Number(map.minute),
+    second: Number(map.second),
+    dateStr: `${map.year}-${map.month}-${map.day}`,
+  };
+}
+
+function timeStringToMinutes(value: string) {
+  const [hh, mm] = value.slice(0, 5).split(":").map(Number);
+  return hh * 60 + mm;
+}
+
+function getLocalDateInMadrid(value: string) {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Europe/Madrid",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date(value));
+}
+
+function getLocalTimeInMadrid(value: string) {
+  return new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Europe/Madrid",
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  }).format(new Date(value));
+}
+
+function getLocalMinutesInMadrid(value: string) {
+  return timeStringToMinutes(getLocalTimeInMadrid(value));
+}
+
 Deno.serve(async () => {
   const supabase = createClient(
     Deno.env.get("SUPABASE_URL")!,
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
   );
 
-  const companyId = "2cff6a40-94d8-4166-bb6f-5e1f46e0e9be";
+  const companyId = "6f41257b-f20e-4e33-9cd1-b4109d02ffb8";
   const results: Array<Record<string, unknown>> = [];
 
-  const { data: longOpen } = await supabase.rpc(
-    "get_long_open_shift_notifications",
-    {
-      p_company_id: companyId,
-    }
-  );
+  const nowMadrid = getMadridNowParts();
+  const nowMinutes = nowMadrid.hour * 60 + nowMadrid.minute;
 
-  const { data: missingCheckin } = await supabase.rpc(
-    "get_missing_checkin_notifications",
-    {
-      p_company_id: companyId,
-    }
-  );
+  const { data: calendar } = await supabase
+    .from("company_work_calendar")
+    .select("company_id, morning_start, lunch_start, afternoon_start, day_end")
+    .eq("company_id", companyId)
+    .single<CalendarRow>();
 
-  const { data: missingLunchCheckout } = await supabase.rpc(
-    "get_missing_lunch_checkout_notifications",
-    {
-      p_company_id: companyId,
-    }
-  );
-
-  const { data: missingLunchCheckin } = await supabase.rpc(
-    "get_missing_lunch_checkin_notifications",
-    {
-      p_company_id: companyId,
-    }
-  );
-
-  const { data: missingFinalCheckout } = await supabase.rpc(
-    "get_missing_final_checkout_notifications",
-    {
-      p_company_id: companyId,
-    }
-  );
-
-  const allCandidates = [
-    ...(longOpen ?? []),
-    ...(missingCheckin ?? []),
-    ...(missingLunchCheckout ?? []),
-    ...(missingLunchCheckin ?? []),
-    ...(missingFinalCheckout ?? []),
-  ];
-
-  for (const item of allCandidates) {
-    const body =
-      item.notification_type === "missing_checkin_warning_1"
-        ? "Todavía no has fichado tu entrada."
-        : item.notification_type === "missing_checkin_warning_2"
-        ? "Segundo aviso: sigue sin constar tu fichaje de entrada."
-        : item.notification_type === "missing_lunch_checkout_warning_1"
-        ? "Puede que hayas olvidado fichar la salida de comida."
-        : item.notification_type === "missing_lunch_checkin_warning_1"
-        ? "Puede que hayas olvidado fichar la vuelta de comida."
-        : item.notification_type === "missing_final_checkout_warning_1"
-        ? "Puede que hayas olvidado fichar tu salida final."
-        : "Llevas muchas horas con la jornada abierta. Revisa si falta fichar la salida.";
-
-    const res = await fetch(
-      "https://dooldjcaasfrmtozcyyq.supabase.co/functions/v1/send_push_notification",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "apikey":
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRvb2xkamNhYXNmcm10b3pjeXlxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk1MTg3ODgsImV4cCI6MjA4NTA5NDc4OH0.T0KruRRY4FjFoKnitIsEReuemZBLpnxm_R90nAfhU00",
-          "Authorization":
-            "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRvb2xkamNhYXNmcm10b3pjeXlxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk1MTg3ODgsImV4cCI6MjA4NTA5NDc4OH0.T0KruRRY4FjFoKnitIsEReuemZBLpnxm_R90nAfhU00",
-        },
-        body: JSON.stringify({
-          company_id: item.company_id,
-          user_id: item.user_id,
-          notification_type: item.notification_type,
-          reference_date: item.reference_date,
-          reference_slot: item.reference_slot,
-          title: "Cerbero",
-          body,
-        }),
-      }
-    );
-
-    const text = await res.text();
-
-    results.push({
-      stage: "push",
-      notification_type: item.notification_type,
-      user_id: item.user_id,
-      status: res.status,
-      body: text,
+  if (!calendar) {
+    return new Response(JSON.stringify({ ok: false, error: "No calendar" }), {
+      headers: { "Content-Type": "application/json" },
+      status: 500,
     });
   }
 
-  const now = new Date();
-  const hh = now.getHours();
-  const mm = now.getMinutes();
+  const morningDeadline = timeStringToMinutes(calendar.morning_start!) + 45;
+  const lunchDeadline = timeStringToMinutes(calendar.lunch_start!) + 45;
+  const afternoonDeadline = timeStringToMinutes(calendar.afternoon_start!) + 45;
+  const finalDeadline = timeStringToMinutes(calendar.day_end!) + 45;
 
-  const isMissingCheckinIncidentWindow = hh === 9 && mm >= 15;
+  const { data: memberships } = await supabase
+    .from("memberships")
+    .select("user_id, company_id, role")
+    .eq("company_id", companyId)
+    .in("role", ["employee", "worker"])
+    .returns<MembershipRow[]>();
 
-  if (isMissingCheckinIncidentWindow) {
-    const { data: incidentCandidates } = await supabase.rpc(
-      "get_missing_checkin_notifications",
-      {
-        p_company_id: companyId,
+  for (const member of memberships ?? []) {
+    const { data: entries } = await supabase
+      .from("time_entries")
+      .select("id, check_in_at, check_out_at")
+      .eq("company_id", companyId)
+      .eq("user_id", member.user_id)
+      .returns<TimeEntryRow[]>();
+
+    const todayEntries = (entries ?? []).filter((entry) => {
+      if (!entry.check_in_at) return false;
+      return getLocalDateInMadrid(entry.check_in_at) === nowMadrid.dateStr;
+    });
+
+    const sorted = [...todayEntries].sort((a, b) =>
+      new Date(a.check_in_at!).getTime() - new Date(b.check_in_at!).getTime()
+    );
+
+    const first = sorted[0] ?? null;
+    const second = sorted[1] ?? null;
+
+    const firstMinutes = first?.check_in_at ? getLocalMinutesInMadrid(first.check_in_at) : null;
+    const lunchOutMinutes = first?.check_out_at ? getLocalMinutesInMadrid(first.check_out_at) : null;
+    const secondMinutes = second?.check_in_at ? getLocalMinutesInMadrid(second.check_in_at) : null;
+    const finalOutMinutes = second?.check_out_at ? getLocalMinutesInMadrid(second.check_out_at) : null;
+
+    if (nowMinutes >= morningDeadline) {
+      if (firstMinutes === null || firstMinutes > morningDeadline) {
+        await supabase.rpc("create_missing_checkin_incident", {
+          p_company_id: companyId,
+          p_user_id: member.user_id,
+        });
       }
-    );
+      if (first && firstMinutes! > morningDeadline) {
+        await supabase.rpc("create_late_checkin_incident", {
+          p_company_id: companyId,
+          p_user_id: member.user_id,
+          p_time_entry_id: first.id,
+        });
+      }
+    }
 
-    const finalIncidentCandidates = (incidentCandidates ?? []).filter(
-      (item: any) => item.notification_type === "missing_checkin_warning_2"
-    );
+    if (nowMinutes >= lunchDeadline) {
+      if (lunchOutMinutes === null || lunchOutMinutes > lunchDeadline) {
+        await supabase.rpc("create_missing_lunch_checkout_incident", {
+          p_company_id: companyId,
+          p_user_id: member.user_id,
+        });
+      }
+      if (first && lunchOutMinutes && lunchOutMinutes > lunchDeadline) {
+        await supabase.rpc("create_late_lunch_checkout_incident", {
+          p_company_id: companyId,
+          p_user_id: member.user_id,
+          p_time_entry_id: first.id,
+        });
+      }
+    }
 
-    for (const item of finalIncidentCandidates) {
-      const { error } = await supabase.rpc(
-        "create_missing_checkin_incident",
-        {
-          p_company_id: item.company_id,
-          p_user_id: item.user_id,
-        }
-      );
+    if (nowMinutes >= afternoonDeadline) {
+      if (secondMinutes === null || secondMinutes > afternoonDeadline) {
+        await supabase.rpc("create_missing_afternoon_checkin_incident", {
+          p_company_id: companyId,
+          p_user_id: member.user_id,
+        });
+      }
+      if (second && secondMinutes! > afternoonDeadline) {
+        await supabase.rpc("create_late_afternoon_checkin_incident", {
+          p_company_id: companyId,
+          p_user_id: member.user_id,
+          p_time_entry_id: second.id,
+        });
+      }
+    }
 
-      results.push({
-        stage: "incident_escalation",
-        notification_type: "missing_checkin_incident",
-        user_id: item.user_id,
-        ok: !error,
-        error: error?.message ?? null,
-      });
+    if (nowMinutes >= finalDeadline) {
+      if (finalOutMinutes === null || finalOutMinutes > finalDeadline) {
+        await supabase.rpc("create_missing_final_checkout_incident", {
+          p_company_id: companyId,
+          p_user_id: member.user_id,
+        });
+      }
+      if (second && finalOutMinutes && finalOutMinutes > finalDeadline) {
+        await supabase.rpc("create_late_final_checkout_incident", {
+          p_company_id: companyId,
+          p_user_id: member.user_id,
+          p_time_entry_id: second.id,
+        });
+      }
     }
   }
 
-  return new Response(
-    JSON.stringify({
-      ok: true,
-      processed: allCandidates.length,
-      results,
-    }),
-    {
-      headers: { "Content-Type": "application/json" },
-    }
-  );
+  return new Response(JSON.stringify({ ok: true, results }), {
+    headers: { "Content-Type": "application/json" },
+  });
 });
